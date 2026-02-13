@@ -7,12 +7,9 @@ const config: Config = {
   tagline: 'Руководство по использованию движка',
   favicon: 'img/favicon.png',
 
-  future: {
-    v4: true,
-  },
 
-  url: 'https://dollmanb.github.io/ProchercDocs.github.io/',
-  baseUrl: '/',
+  url: 'https://dollmanb.github.io',
+  baseUrl: '/ProchercDocs.github.io/',
 
   organizationName: 'dollmanb',
   projectName: 'ProchercEngine',
@@ -53,7 +50,7 @@ const config: Config = {
 
   themeConfig: {
     image: 'img/docusaurus-social-card.jpg',
-    Mode: {
+    colorMode: {
       defaultMode: 'dark',
       disableSwitch: false,
       respectPrefersColorScheme: false,

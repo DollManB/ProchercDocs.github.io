@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[1903],{1912(o){o.exports=JSON.parse('{"blogBasePath":"/ProchercDocs.github.io/blog","blogTitle":"Blog","authorsListPath":"/ProchercDocs.github.io/blog/authors"}')}}]);
