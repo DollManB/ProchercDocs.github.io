@@ -11,7 +11,7 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://dollmanb.github.io/ProchercDocs.github.io/',
   baseUrl: '/',
 
   organizationName: 'dollmanb',
