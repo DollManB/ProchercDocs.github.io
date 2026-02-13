@@ -8,11 +8,11 @@ const config: Config = {
   favicon: 'img/favicon.png',
 
 
-  url: 'https://dollmanb.github.io',
-  baseUrl: '/ProchercDocs.github.io/',
+  url: 'https://DollManB.github.io',
+  baseUrl: '/pe_docs/',
 
-  organizationName: 'dollmanb',
-  projectName: 'ProchercEngine',
+  organizationName: 'DollManB',
+  projectName: 'pe_docs',
 
   onBrokenLinks: 'throw',
   i18n: {
