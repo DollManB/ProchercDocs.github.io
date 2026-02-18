@@ -354,6 +354,180 @@
       text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     }
 
+    /* Стили для документации API */
+    .api-header {
+      background: rgba(110, 142, 251, 0.2);
+      border-left: 4px solid #6e8efb;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+    }
+
+    .api-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .api-description {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .api-section {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .api-section-title {
+      font-size: 1.5rem;
+      color: #6e8efb;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .api-section-title i {
+      font-size: 1.8rem;
+    }
+
+    .api-best-practices {
+      background: rgba(46, 204, 113, 0.1);
+      border-left: 4px solid #2ecc71;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .api-best-practices h4 {
+      color: #2ecc71;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .api-limitations {
+      background: rgba(241, 196, 15, 0.1);
+      border-left: 4px solid #f1c40f;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .api-limitations h4 {
+      color: #f1c40f;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .api-code-block {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      color: #ecf756;
+      margin: 10px 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .api-code-block .comment {
+      color: #6a9955;
+    }
+
+    .api-code-block .keyword {
+      color: #569cd6;
+    }
+
+    .api-code-block .string {
+      color: #ecf756;
+    }
+
+    .api-code-block .function {
+      color: #dcdcaa;
+    }
+
+    .api-link {
+      color: #6e8efb;
+      text-decoration: none;
+      border-bottom: 1px dashed #6e8efb;
+    }
+
+    .api-link:hover {
+      color: #a777e3;
+      border-bottom-color: #a777e3;
+    }
+
+    .api-method {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .api-method-name {
+      color: #ecf756;
+      font-family: 'Courier New', monospace;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .api-method-description {
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 10px;
+    }
+
+    .api-method-example {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .api-highlight {
+      color: #ecf756;
+      font-weight: 600;
+    }
+
+    .api-note {
+      background: rgba(52, 152, 219, 0.1);
+      border-left: 4px solid #3498db;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+
+    .api-note i {
+      color: #3498db;
+      margin-right: 10px;
+    }
+
+    .serverplayer-info {
+      background: rgba(110, 142, 251, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .serverplayer-info code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ecf756;
+    }
+
     /* Стили профиля */
     .profile-card {
       background: rgba(255, 255, 255, 0.1);
@@ -638,8 +812,6 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
       z-index: 1000;
       justify-content: center;
       align-items: center;
@@ -649,26 +821,44 @@
       display: flex;
     }
 
+    .modal-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      filter: blur(15px) brightness(0.5);
+      transform: scale(1.1);
+      transition: all 0.5s ease;
+      z-index: -1;
+    }
+
     .modal-content {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(20px);
-      border-radius: 30px;
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 40px;
       border: 1px solid rgba(255, 255, 255, 0.3);
       padding: 40px;
       max-width: 500px;
       width: 90%;
       position: relative;
-      animation: modalPop 0.3s ease-out;
+      animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+      z-index: 2;
     }
 
     @keyframes modalPop {
       from {
         opacity: 0;
-        transform: scale(0.8);
+        transform: scale(0.8) translateY(30px);
       }
       to {
         opacity: 1;
-        transform: scale(1);
+        transform: scale(1) translateY(0);
       }
     }
 
@@ -676,10 +866,10 @@
       position: absolute;
       top: 20px;
       right: 20px;
-      background: none;
-      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       color: white;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       cursor: pointer;
       width: 40px;
       height: 40px;
@@ -688,18 +878,21 @@
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      z-index: 3;
     }
 
     .modal-close:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: rotate(90deg);
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg) scale(1.1);
+      border-color: white;
     }
 
     .modal-profile {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 25px;
     }
 
     .modal-avatar {
@@ -708,7 +901,17 @@
       border-radius: 50%;
       object-fit: cover;
       border: 4px solid #6e8efb;
-      box-shadow: 0 0 30px rgba(110, 142, 251, 0.5);
+      box-shadow: 0 0 40px rgba(110, 142, 251, 0.6);
+      animation: avatarGlow 2s infinite alternate;
+    }
+
+    @keyframes avatarGlow {
+      from {
+        box-shadow: 0 0 30px rgba(110, 142, 251, 0.5);
+      }
+      to {
+        box-shadow: 0 0 60px rgba(110, 142, 251, 0.8);
+      }
     }
 
     .modal-name {
@@ -718,133 +921,49 @@
       font-size: 2rem;
       font-weight: 700;
       color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
     .modal-premium-badge {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
+      filter: drop-shadow(0 0 10px gold);
     }
 
     .modal-detail {
       width: 100%;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
       border-left: 4px solid #6e8efb;
+      transition: all 0.3s ease;
+    }
+
+    .modal-detail:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
     }
 
     .modal-detail-label {
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255, 255, 255, 0.8);
       font-size: 0.9rem;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-detail-label i {
+      color: #6e8efb;
     }
 
     .modal-detail-value {
       color: white;
       font-size: 1.1rem;
       word-break: break-word;
-    }
-
-    .player-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .stat-item {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 15px;
-      border-left: 4px solid #ff8c7a;
-      animation: slideIn 0.5s ease-out;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    .hitbox-demo {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-    }
-
-    .box {
-      width: 100px;
-      height: 100px;
-      background: rgba(255, 100, 100, 0.3);
-      border: 3px solid #ff5f6d;
-      border-radius: 20px;
-      transition: all 0.3s;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .box:hover {
-      transform: scale(1.2);
-      background: rgba(255, 100, 100, 0.6);
-      box-shadow: 0 0 30px #ff5f6d;
-    }
-
-    .box::after {
-      content: 'Хитбокс';
-      position: absolute;
-      bottom: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: white;
-      font-size: 0.8rem;
-      white-space: nowrap;
-    }
-
-    .server-status {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .ping {
-      background: rgba(0, 255, 0, 0.2);
-      border-radius: 50px;
-      padding: 8px 25px;
-      border: 1px solid #00ff88;
-      color: #00ff88;
-      font-weight: bold;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
-      70% { box-shadow: 0 0 0 15px rgba(0, 255, 136, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
-    }
-
-    .time-display {
-      font-size: 3rem;
-      font-weight: 700;
-      font-family: 'Courier New', monospace;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 25px;
-      border-radius: 40px;
-      letter-spacing: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-      animation: glow 2s infinite alternate;
-    }
-
-    @keyframes glow {
-      from { text-shadow: 0 0 10px cyan; }
-      to { text-shadow: 0 0 30px blue, 0 0 10px purple; }
-    }
-
-    .date {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 1.5rem;
-      color: #aaddff;
+      line-height: 1.5;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
     /* Стили для аутентификации */
@@ -855,8 +974,8 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-      z-index: 100;
+      backdrop-filter: blur(10px);
+      z-index: 1000;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -872,55 +991,63 @@
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-radius: 30px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
       padding: 40px;
       width: 90%;
       max-width: 450px;
-      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: slideUp 0.5s ease-out;
     }
 
-    @keyframes popIn {
-      0% { transform: scale(0.8); opacity: 0; }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); opacity: 1; }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
     }
 
     .auth-header h1 {
       font-size: 2.5rem;
-      margin-bottom: 10px;
-      background: linear-gradient(45deg, #6e8efb, #a777e3);
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-align: center;
+      margin-bottom: 10px;
     }
 
     .auth-header p {
-      text-align: center;
       color: rgba(255, 255, 255, 0.8);
-      margin-bottom: 30px;
+      font-size: 1rem;
     }
 
     .auth-tabs {
       display: flex;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50px;
-      padding: 5px;
+      gap: 10px;
       margin-bottom: 30px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px;
+      border-radius: 60px;
     }
 
     .auth-tab {
       flex: 1;
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.7);
       padding: 12px;
-      border-radius: 50px;
-      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
       font-size: 1rem;
       font-weight: 600;
+      cursor: pointer;
+      border-radius: 60px;
       transition: all 0.3s ease;
     }
 
@@ -932,12 +1059,12 @@
     .auth-tab.active {
       background: linear-gradient(135deg, #6e8efb, #a777e3);
       color: white;
-      box-shadow: 0 5px 15px rgba(110, 142, 251, 0.4);
+      box-shadow: 0 5px 20px rgba(110, 142, 251, 0.4);
     }
 
     .auth-form-container {
       position: relative;
-      min-height: 250px;
+      min-height: 320px;
     }
 
     .auth-form {
@@ -946,15 +1073,15 @@
       left: 0;
       width: 100%;
       opacity: 0;
-      transform: translateY(20px);
+      visibility: hidden;
+      transform: translateX(20px);
       transition: all 0.4s ease;
-      display: none;
     }
 
     .auth-form.active {
-      display: block;
       opacity: 1;
-      transform: translateY(0);
+      visibility: visible;
+      transform: translateX(0);
     }
 
     .form-group {
@@ -962,43 +1089,43 @@
       margin-bottom: 20px;
     }
 
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 1.1rem;
+    }
+
     .form-group input {
       width: 100%;
-      padding: 15px 45px 15px 45px;
+      padding: 15px 15px 15px 45px;
       background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 15px;
       color: white;
       font-size: 1rem;
       transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
       outline: none;
+      border-color: #6e8efb;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 20px rgba(110, 142, 251, 0.3);
     }
 
     .form-group input::placeholder {
       color: rgba(255, 255, 255, 0.5);
     }
 
-    .form-group input:focus {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.6);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-    }
-
-    .form-group i {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 1.2rem;
-    }
-
     .auth-error {
-      color: #ff4757;
+      color: #ff6b6b;
       font-size: 0.9rem;
       margin-bottom: 15px;
-      min-height: 20px;
       text-align: center;
+      min-height: 20px;
     }
 
     .auth-btn {
@@ -1009,16 +1136,15 @@
       border-radius: 15px;
       color: white;
       font-size: 1.1rem;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 10px 25px rgba(110, 142, 251, 0.4);
-      letter-spacing: 1px;
+      box-shadow: 0 10px 20px rgba(110, 142, 251, 0.3);
     }
 
     .auth-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 35px rgba(110, 142, 251, 0.6);
+      box-shadow: 0 15px 30px rgba(110, 142, 251, 0.5);
     }
 
     .auth-btn:active {
@@ -1026,24 +1152,24 @@
     }
 
     .auth-footer {
-      margin-top: 30px;
+      margin-top: 25px;
       text-align: center;
     }
 
     .guest-btn {
       background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: rgba(255, 255, 255, 0.8);
       padding: 12px 25px;
       border-radius: 30px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       transition: all 0.3s ease;
     }
 
     .guest-btn:hover {
       background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.6);
+      border-color: rgba(255, 255, 255, 0.4);
       color: white;
     }
 
@@ -1064,6 +1190,22 @@
       
       .profile-card {
         flex-direction: column;
+      }
+      
+      .auth-card {
+        padding: 30px 20px;
+      }
+      
+      .auth-header h1 {
+        font-size: 2rem;
+      }
+      
+      .modal-content {
+        padding: 30px 20px;
+      }
+      
+      .modal-name {
+        font-size: 1.5rem;
       }
     }
   </style>
@@ -1091,12 +1233,12 @@
         <!-- Форма входа -->
         <form id="login-form" class="auth-form active">
           <div class="form-group">
-            <input type="email" id="login-email" placeholder="Email" required>
             <i class="fas fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="Email" required>
           </div>
           <div class="form-group">
-            <input type="password" id="login-password" placeholder="Пароль" required>
             <i class="fas fa-lock"></i>
+            <input type="password" id="login-password" placeholder="Пароль" required>
           </div>
           <div id="login-error" class="auth-error"></div>
           <button type="submit" class="auth-btn">
@@ -1107,20 +1249,20 @@
         <!-- Форма регистрации -->
         <form id="register-form" class="auth-form">
           <div class="form-group">
-            <input type="text" id="register-name" placeholder="Имя" required>
             <i class="fas fa-user"></i>
+            <input type="text" id="register-name" placeholder="Имя" required>
           </div>
           <div class="form-group">
-            <input type="email" id="register-email" placeholder="Email" required>
             <i class="fas fa-envelope"></i>
+            <input type="email" id="register-email" placeholder="Email" required>
           </div>
           <div class="form-group">
+            <i class="fas fa-lock"></i>
             <input type="password" id="register-password" placeholder="Пароль" required>
-            <i class="fas fa-lock"></i>
           </div>
           <div class="form-group">
-            <input type="password" id="register-confirm" placeholder="Подтвердите пароль" required>
             <i class="fas fa-lock"></i>
+            <input type="password" id="register-confirm" placeholder="Подтвердите пароль" required>
           </div>
           <div id="register-error" class="auth-error"></div>
           <button type="submit" class="auth-btn">
@@ -1181,16 +1323,78 @@
 
     <!-- Контейнер контента вкладок -->
     <div class="content-container">
-      <!-- Вкладка Игрок -->
-      <div id="player" class="tab-content active-content">
-        <h2 class="content-title" data-i18n="playerTitle">👤 Профиль игрока</h2>
-        <div class="content-body">
-          <p data-i18n="playerDesc">Статистика и информация об игроке.</p>
-          <div class="player-stats">
-            <div class="stat-item"><i class="fas fa-trophy"></i> <span data-i18n="playerStat1">Уровень: 42</span></div>
-            <div class="stat-item"><i class="fas fa-shield-alt"></i> <span data-i18n="playerStat2">Здоровье: 100%</span></div>
-            <div class="stat-item"><i class="fas fa-coins"></i> <span data-i18n="playerStat3">Монеты: 9999</span></div>
-            <div class="stat-item"><i class="fas fa-star"></i> <span data-i18n="playerStat4">Опыт: 5678</span></div>
+      <!-- Вкладка Игрок (документация Player API) -->
+      <div id="player" class="tab-content">
+        <div class="api-header">
+          <div class="api-title">Player API</div>
+          <div class="api-description">
+            Player API предоставляет полный набор инструментов для работы с игроками в игре. 
+            Этот API позволяет управлять всеми аспектами игрока: от базовой информации до сложных взаимодействий.
+          </div>
+        </div>
+
+        <div class="api-section">
+          <div class="api-section-title">
+            <i class="fas fa-check-circle"></i>
+            Лучшие практики
+          </div>
+          <div class="api-best-practices">
+            <h4><i class="fas fa-check"></i> Обработка ошибок</h4>
+            <p>Проверяйте возвращаемые значения на null/undefined</p>
+          </div>
+        </div>
+
+        <div class="api-section">
+          <div class="api-section-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            Ограничения
+          </div>
+          <div class="api-limitations">
+            <ul style="margin-left: 20px; color: rgba(255,255,255,0.9);">
+              <li>Некоторые методы могут не работать с не-игровыми сущностями</li>
+              <li>Модификации инвентаря могут конфликтовать с другими модами</li>
+              <li>Физические изменения могут не синхронизироваться в реальном времени в мультиплеере</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="api-section">
+          <div class="api-section-title">
+            <i class="fas fa-code"></i>
+            Методы API
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">getName()</div>
+            <div class="api-method-description">Получить имя игрока</div>
+            <div class="api-code-block">
+              let name = Player.getName();<br>
+              <span class="comment">// пример использования</span><br>
+              let name = Player.getName();<br>
+              Player.sendMessage(name);
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">sendMessage(text)</div>
+            <div class="api-method-description">Игрок может разговаривать, выводить <span class="api-highlight">сообщение</span> в чат</div>
+            <div class="api-code-block">
+              Player.sendMessage(<span class="string">"text{STRING}"</span>);<br><br>
+              <span class="comment">// с переменной:</span><br>
+              const text = <span class="string">"hi"</span>;<br>
+              Player.sendMessage(text);
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">getServerPlayer()</div>
+            <div class="api-method-description">Получить ServerPlayerEntity - компонент игрока зависящий от net.minecraft.server.network</div>
+            <div class="serverplayer-info">
+              <p>Полную информацию можно посмотреть <a href="https://maven.fabricmc.net/docs/yarn-1.20.1+build.1/net/minecraft/server/network/ServerPlayerEntity.html" target="_blank" class="api-link">тут</a></p>
+            </div>
+            <div class="api-code-block">
+              let player = Player.getServerPlayer(); <span class="comment">// возвращает ServerPlayerEntity в player</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1209,17 +1413,94 @@
         </div>
       </div>
 
-      <!-- Вкладка Сервер -->
+      <!-- Вкладка Сервер (документация Server API) -->
       <div id="server" class="tab-content">
-        <h2 class="content-title" data-i18n="serverTitle">🌐 Состояние сервера</h2>
-        <div class="content-body">
-          <div class="server-status">
-            <i class="fas fa-circle" style="color: #2ecc71; font-size: 1.5rem;"></i>
-            <span data-i18n="serverStatus">Статус: Онлайн</span>
-            <span class="ping" data-i18n="serverPing">Пинг: 24ms</span>
+        <div class="api-header">
+          <div class="api-title">Server API</div>
+          <div class="api-description">
+            Server API предоставляет мощные инструменты для управления сервером и глобальными игровыми процессами. 
+            Этот API позволяет контролировать все аспекты серверной части игры, от управления игроками до выполнения команд и модификации игрового мира.
           </div>
-          <p style="margin-top: 25px;" data-i18n="serverPlayers">Игроков онлайн: 128</p>
-          <p data-i18n="serverUptime">Аптайм: 14 дней 7 часов</p>
+        </div>
+
+        <div class="api-section">
+          <div class="api-section-title">
+            <i class="fas fa-code"></i>
+            Методы API
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">executeCommand(command)</div>
+            <div class="api-method-description">Этот метод позволяет от имени сервера выполнить команду</div>
+            <div class="api-note">
+              <i class="fas fa-info-circle"></i> Необязательно писать через [ / ]
+            </div>
+            <div class="api-code-block">
+              Server.executeCommand(<span class="string">"example command"</span>);<br><br>
+              <span class="comment">// пример:</span><br>
+              Server.executeCommand(<span class="string">"time set day"</span>);<br><br>
+              <span class="comment">// еще пример:</span><br>
+              let plr = Server.getRandomPlayer();<br>
+              let name = plr.getName();<br>
+              Server.executeCommand(<span class="string">"give "</span> + name + <span class="string">" minecraft:stick"</span>);
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">getOnlinePlayer()</div>
+            <div class="api-method-description">Получить список игроков (имена)</div>
+            <div class="api-code-block">
+              <span class="comment">// пример:</span><br>
+              let list = Server.getOnlinePlayer();
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">getPlayerByName(nickname)</div>
+            <div class="api-method-description">Получить игрока по имени</div>
+            <div class="api-code-block">
+              <span class="comment">// пример:</span><br>
+              let player = Server.getPlayerByName(<span class="string">"Nickname"</span>); <span class="comment">// передает PlayerAPI</span><br>
+              <span class="comment">// после этого теперь player у нас является зависимым от PlayerAPI</span>
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">getRandomPlayer()</div>
+            <div class="api-method-description">Получить рандомного игрока</div>
+            <div class="api-code-block">
+              <span class="comment">// пример:</span><br>
+              let player = Server.getRandomPlayer(); <span class="comment">// передает PlayerAPI</span><br>
+              <span class="comment">// теперь player у нас становиться зависимым от PlayerAPI</span>
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name">broadcast(message)</div>
+            <div class="api-method-description">Отправляет сообщение в чат от имени сервера</div>
+            <div class="api-code-block">
+              <span class="comment">// пример:</span><br>
+              Server.broadcast(<span class="string">"привет мир!"</span>);
+            </div>
+          </div>
+        </div>
+
+        <div class="api-section">
+          <div class="api-section-title">
+            <i class="fas fa-cog"></i>
+            Полный пример использования
+          </div>
+          <div class="api-code-block">
+            <span class="comment">// Пример: Выдать рандомному игроку алмаз</span><br>
+            function giveRandomPlayerDiamond() {<br>
+            &nbsp;&nbsp;let randomPlayer = Server.getRandomPlayer();<br>
+            &nbsp;&nbsp;if (randomPlayer) {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;let playerName = randomPlayer.getName();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;Server.executeCommand(<span class="string">"give "</span> + playerName + <span class="string">" minecraft:diamond"</span>);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;Server.broadcast(<span class="string">"Игрок "</span> + playerName + <span class="string">" получил алмаз!"</span>);<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
         </div>
       </div>
 
@@ -1361,6 +1642,7 @@
 
   <!-- Модальное окно просмотра профиля -->
   <div id="profile-modal" class="modal">
+    <div id="modal-background" class="modal-background"></div>
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <div id="modal-profile" class="modal-profile">
@@ -1442,6 +1724,7 @@
 
       // Модальное окно
       const modal = document.getElementById('profile-modal');
+      const modalBackground = document.getElementById('modal-background');
       const modalProfile = document.getElementById('modal-profile');
 
       // Функция открытия модального окна с профилем
@@ -1454,6 +1737,15 @@
             const email = userData.email || 'Email не указан';
             const premium = userData.premium || false;
             const description = userData.description || 'Нет описания';
+            const background = userData.background || DEFAULT_BACKGROUND;
+            
+            // Устанавливаем фон модального окна (блюр)
+            if (background.startsWith('http')) {
+              modalBackground.style.background = `url('${background}')`;
+            } else {
+              // Для градиентов используем тот же градиент
+              modalBackground.style.background = background;
+            }
             
             modalProfile.innerHTML = `
               <img src="${avatar}" class="modal-avatar" alt="Avatar">
@@ -1462,15 +1754,15 @@
                 ${premium ? '<img src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" class="modal-premium-badge">' : ''}
               </div>
               <div class="modal-detail">
-                <div class="modal-detail-label">Email</div>
+                <div class="modal-detail-label"><i class="fas fa-envelope"></i> Email</div>
                 <div class="modal-detail-value">${email}</div>
               </div>
               <div class="modal-detail">
-                <div class="modal-detail-label">Описание</div>
+                <div class="modal-detail-label"><i class="fas fa-quote-right"></i> Описание</div>
                 <div class="modal-detail-value">${description}</div>
               </div>
               <div class="modal-detail">
-                <div class="modal-detail-label">Premium статус</div>
+                <div class="modal-detail-label"><i class="fas fa-crown"></i> Premium статус</div>
                 <div class="modal-detail-value">${premium ? 'Активен' : 'Не активен'}</div>
               </div>
             `;
@@ -1483,6 +1775,7 @@
       // Закрытие модального окна
       window.closeModal = function() {
         modal.classList.remove('active');
+        modalBackground.style.background = '';
       };
 
       // Закрытие по клику вне модального окна
