@@ -153,7 +153,7 @@
         const nickname = userData.nickname || t('user', currentLang);
         const email = userData.email || t('noEmail', currentLang);
         const premium = userData.premium || false;
-        const description = userData.description || t('noDescription', currentLang);
+        const description = userData.description || t('', currentLang);
         const background = userData.background || DEFAULT_BACKGROUND;
         
         // Устанавливаем фон модального окна (блюр)
