@@ -304,6 +304,22 @@ const translations = {
     confirmCancel: 'Отмена',
     confirmOk: 'Подтвердить',
 
+    // Новые функции сообществ
+    deleteCommunity: 'Удалить сообщество',
+    leaveCommunity: 'Покинуть сообщество',
+    deletePost: 'Удалить пост',
+    communityNotFound: 'Сообщество не найдено',
+    onlyOwnerCanDelete: 'Только владелец может удалить сообщество',
+    cantDeletePost: 'Вы не можете удалить этот пост',
+    postNotFound: 'Пост не найден',
+    postDeleted: 'Пост удалён',
+    communityDeleted: 'Сообщество удалено',
+    leftCommunity: 'Вы вышли из сообщества',
+    ownerCantLeave: 'Владелец не может выйти из сообщества. Удалите сообщество вместо этого.',
+    confirmDeleteCommunity: 'Вы уверены, что хотите удалить сообщество "{name}"? Все посты и участники будут удалены.',
+    confirmDeletePost: 'Вы уверены, что хотите удалить этот пост?',
+    confirmLeaveCommunity: 'Вы уверены, что хотите выйти из сообщества?',
+
     // Общие
     loading: 'Загрузка',
     noDescription: 'Нет описания',
@@ -568,6 +584,22 @@ const translations = {
     confirmTitle: 'Confirm Action',
     confirmCancel: 'Cancel',
     confirmOk: 'Confirm',
+
+    // New community functions
+    deleteCommunity: 'Delete Community',
+    leaveCommunity: 'Leave Community',
+    deletePost: 'Delete Post',
+    communityNotFound: 'Community not found',
+    onlyOwnerCanDelete: 'Only owner can delete community',
+    cantDeletePost: 'You cannot delete this post',
+    postNotFound: 'Post not found',
+    postDeleted: 'Post deleted',
+    communityDeleted: 'Community deleted',
+    leftCommunity: 'You left the community',
+    ownerCantLeave: 'Owner cannot leave community. Delete the community instead.',
+    confirmDeleteCommunity: 'Are you sure you want to delete community "{name}"? All posts and members will be removed.',
+    confirmDeletePost: 'Are you sure you want to delete this post?',
+    confirmLeaveCommunity: 'Are you sure you want to leave the community?',
 
     // General
     loading: 'Loading',

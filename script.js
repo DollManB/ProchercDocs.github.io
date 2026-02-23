@@ -1670,6 +1670,8 @@
               ${comm.type !== 'public' ? `<button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="openInviteModal('${commId}', '${comm.name.replace(/'/g, "\\'")}')"><i class="fas fa-link"></i> ${t('invite', currentLang)}</button>` : ''}
               ${isOwner ? `<button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="openVerificationModal('${commId}', '${comm.name.replace(/'/g, "\\'")}', ${comm.verified || false}, true)"><i class="fas fa-check-circle"></i> ${t('verification', currentLang)}</button>` : ''}
               <button class="auth-btn secondary" style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="openMembersModal('${commId}')"><i class="fas fa-users"></i> ${t('members', currentLang)}</button>
+              ${isOwner ? `<button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #ff4757, #ff6b81);" onclick="deleteCommunity('${commId}', '${comm.name.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i> ${t('deleteCommunity', currentLang)}</button>` : `
+              <button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #ffa502, #ff7f50);" onclick="leaveCommunity('${commId}')"><i class="fas fa-sign-out-alt"></i> ${t('leaveCommunity', currentLang)}</button>`}
               <button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #6e8efb, #a777e3);" onclick="openPostModal('${commId}')"><i class="fas fa-pen"></i> ${t('createPost', currentLang)}</button>
             ` : `
               <button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="joinCommunityFromView('${commId}')"><i class="fas fa-sign-in-alt"></i> ${t('joinCommunity', currentLang)}</button>
@@ -1856,6 +1858,17 @@
             <span style="margin-left: 15px;"><i class="fas fa-calendar"></i> ${date}</span>
           </div>
           <p style="color: rgba(255,255,255,0.9); line-height: 1.6; white-space: pre-wrap;">${post.content || ''}</p>
+          
+          <!-- Кнопка удаления поста -->
+          ${user && (user.uid === post.authorId || isMember) ? `
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+              ${user.uid === post.authorId || (isMember && isMember.role === 'owner') || (isMember && isMember.role === 'admin') ? `
+                <button class="auth-btn" style="width: auto; padding: 8px 15px; background: linear-gradient(135deg, #ff4757, #ff6b81);" onclick="deletePost('${post.id}', '${commId}', '${post.authorId}')">
+                  <i class="fas fa-trash"></i> ${t('deletePost', currentLang)}
+                </button>
+              ` : ''}
+            </div>
+          ` : ''}
         </div>
         
         <h3 style="color: white; margin-bottom: 15px;"><i class="fas fa-comments"></i> ${t('comments', currentLang)} <span id="comments-count">(${post.commentsCount || 0})</span></h3>
@@ -1981,8 +1994,10 @@
         return (roleOrder[a.role] || 4) - (roleOrder[b.role] || 4);
       });
       
-      let html = '';
-      membersArray.forEach(member => {
+      // Получаем данные пользователей из Realtime Database для аватарок
+      let membersHtml = '';
+      
+      for (const member of membersArray) {
         const roleIcons = {
           'owner': '<i class="fas fa-crown" style="color: #ffa502;"></i>',
           'admin': '<i class="fas fa-shield-alt" style="color: #2ed573;"></i>',
@@ -1997,11 +2012,35 @@
           'member': t('roleMember', currentLang)
         };
         
-        const joinDate = member.joinedAt ? new Date(member.joinedAt).toLocaleDateString('ru-RU') : '';
+        // Правильно обрабатываем дату из Firestore
+        let joinDate = '';
+        if (member.joinedAt) {
+          if (member.joinedAt.toDate && typeof member.joinedAt.toDate === 'function') {
+            joinDate = member.joinedAt.toDate().toLocaleDateString('ru-RU');
+          } else if (member.joinedAt instanceof Date) {
+            joinDate = member.joinedAt.toLocaleDateString('ru-RU');
+          } else if (typeof member.joinedAt === 'number') {
+            joinDate = new Date(member.joinedAt).toLocaleDateString('ru-RU');
+          } else if (typeof member.joinedAt === 'string') {
+            joinDate = new Date(member.joinedAt).toLocaleDateString('ru-RU');
+          }
+        }
         
-        html += `
+        // Получаем аватарку пользователя из базы данных
+        let memberAvatar = DEFAULT_AVATAR;
+        try {
+          const userSnapshot = await database.ref('users/' + member.uid).once('value');
+          const userData = userSnapshot.val();
+          if (userData && userData.avatar) {
+            memberAvatar = userData.avatar;
+          }
+        } catch (e) {
+          console.log('Не удалось получить аватар для:', member.uid);
+        }
+        
+        membersHtml += `
           <div class="member-item" onclick="openUserProfile('${member.uid}')" style="display: flex; align-items: center; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: background 0.2s;">
-            <img src="${DEFAULT_AVATAR}" style="width: 45px; height: 45px; border-radius: 50%; margin-right: 12px;">
+            <img src="${memberAvatar}" style="width: 45px; height: 45px; border-radius: 50%; margin-right: 12px; object-fit: cover;">
             <div style="flex: 1;">
               <div style="color: white; font-weight: bold;">
                 ${member.nickname || 'Unknown'}
@@ -2014,9 +2053,9 @@
             <i class="fas fa-chevron-right" style="color: rgba(255,255,255,0.3);"></i>
           </div>
         `;
-      });
+      }
       
-      membersList.innerHTML = html;
+      membersList.innerHTML = membersHtml;
       
     } catch (error) {
       console.error('Ошибка загрузки участников:', error);
@@ -2117,13 +2156,90 @@
       // Проверяем, авторизован ли пользователь
       const user = auth.currentUser;
       if (user) {
-        viewCommunity(joinCode);
+        // Получаем информацию о сообществе и обрабатываем присоединение
+        processCommunityJoin(joinCode);
       } else {
         // Показываем уведомление после входа
         sessionStorage.setItem('pendingJoin', joinCode);
       }
     }
   }
+  
+  // Обработка присоединения к сообществу по коду
+  async function processCommunityJoin(commId) {
+    const user = auth.currentUser;
+    if (!user) {
+      showToast(t('loginRequired', currentLang), 'warning');
+      return;
+    }
+    
+    try {
+      const commDoc = await firestore.collection('communities').doc(commId).get();
+      const comm = commDoc.data();
+      
+      if (!comm) {
+        showToast(t('communityNotFound', currentLang), 'error');
+        return;
+      }
+      
+      // Проверяем, является ли пользователь уже участником
+      const memberDoc = await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).get();
+      
+      if (memberDoc.exists) {
+        // Уже участник - открываем сообщество
+        openViewCommunityModal(commId);
+        return;
+      }
+      
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+      
+      if (comm.type === 'public') {
+        // Автоматически присоединяемся к публичному
+        await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).set({
+          role: 'member',
+          joinedAt: now,
+          nickname: headerNickname.textContent
+        });
+        
+        await firestore.collection('user_communities').doc(user.uid).collection('communities').doc(commId).set({
+          role: 'member',
+          joinedAt: now
+        });
+        
+        // Увеличиваем счётчик участников
+        await firestore.collection('communities').doc(commId).update({
+          membersCount: firebase.firestore.FieldValue.increment(1)
+        });
+        
+        showToast(t('joinedCommunity', currentLang), 'success');
+        openViewCommunityModal(commId);
+      } else if (comm.type === 'restricted') {
+        // Для ограниченного - подаём заявку
+        await firestore.collection('community_requests').doc(commId).collection('requests').doc(user.uid).set({
+          nickname: headerNickname.textContent,
+          requestedAt: now,
+          status: 'pending'
+        });
+        
+        showToast(t('requestSent', currentLang), 'info');
+        // Всё равно показываем сообщество
+        loadCommunityPosts(commId);
+        openViewCommunityModal(commId);
+      } else {
+        // Закрытое сообщество - показываем уведомление, но открываем модалку
+        showToast(t('communityPrivate', currentLang), 'warning');
+        openViewCommunityModal(commId);
+      }
+    } catch (error) {
+      console.error('Ошибка присоединения по ссылке:', error);
+      showToast(t('error', currentLang), 'error');
+    }
+  }
+  
+  // Функция присоединения к сообществу из просмотра (открытая)
+  window.joinCommunityFromView = async function(commId) {
+    await processCommunityJoin(commId);
+  };
   
   // Обработка ожидающего приглашения после входа
   auth.onAuthStateChanged((user) => {
@@ -2177,6 +2293,9 @@
   window.tGlobal = t;
   window.currentLangGlobal = currentLang;
   window.headerNicknameGlobal = headerNickname;
+  window.firestoreGlobal = firestore;
+  window.loadCommunitiesGlobal = loadCommunities;
+  window.loadCommunityPostsGlobal = loadCommunityPosts;
 })();
 
 // Глобальные функции для админа
@@ -2244,5 +2363,228 @@ window.showBanDialog = function(uid, nickname) {
   const reason = prompt(t('enterBanReason', currentLang));
   if (reason !== null && reason.trim() !== '') {
     window.banUser(uid, reason.trim());
+  }
+};
+
+// ============ НОВЫЕ ФУНКЦИИ ДЛЯ СООБЩЕСТВ И ПОСТОВ ============
+
+// Удаление сообщества (только для владельца)
+window.deleteCommunity = async function(commId, commName) {
+  const auth = window.firebaseAuth;
+  const firestore = window.firebaseFirestore;
+  const firebase = window.firebase;
+  const showToast = window.showToastGlobal;
+  const t = window.tGlobal;
+  const currentLang = window.currentLangGlobal;
+  
+  // Показываем подтверждение
+  const confirmed = confirm(t('confirmDeleteCommunity', currentLang) || 'Вы уверены, что хотите удалить сообщество "' + commName + '"? Все посты и участники будут удалены.');
+  
+  if (!confirmed) return;
+  
+  const user = auth?.currentUser;
+  if (!user) {
+    showToast(t('loginRequired', currentLang), 'warning');
+    return;
+  }
+  
+  try {
+    // Получаем данные сообщества
+    const commDoc = await firestore.collection('communities').doc(commId).get();
+    const commData = commDoc.data();
+    
+    // Проверяем, является ли пользователь владельцем
+    if (commData && commData.ownerId !== user.uid) {
+      showToast(t('onlyOwnerCanDelete', currentLang) || 'Только владелец может удалить сообщество', 'error');
+      return;
+    }
+    
+    // Удаляем все посты сообщества
+    const postsSnapshot = await firestore.collection('community_posts').doc(commId).collection('posts').get();
+    const deletePostPromises = postsSnapshot.docs.map(postDoc => 
+      firestore.collection('community_posts').doc(commId).collection('posts').doc(postDoc.id).delete()
+    );
+    await Promise.all(deletePostPromises);
+    
+    // Удаляем коллекцию постов
+    await firestore.collection('community_posts').doc(commId).delete();
+    
+    // Удаляем всех участников
+    const membersSnapshot = await firestore.collection('community_members').doc(commId).collection('members').get();
+    const deleteMemberPromises = membersSnapshot.docs.map(memberDoc =>
+      firestore.collection('community_members').doc(commId).collection('members').doc(memberDoc.id).delete()
+    );
+    await Promise.all(deleteMemberPromises);
+    
+    // Удаляем коллекцию участников
+    await firestore.collection('community_members').doc(commId).delete();
+    
+    // Удаляем сообщество из списков пользователей
+    // (это нужно делать отдельно для каждого пользователя - можно оставить как есть)
+    
+    // Удаляем само сообщество
+    await firestore.collection('communities').doc(commId).delete();
+    
+    showToast(t('communityDeleted', currentLang) || 'Сообщество удалено', 'success');
+    
+    // Закрываем модалку и обновляем список
+    if (typeof window.closeViewCommunityModal === 'function') {
+      window.closeViewCommunityModal();
+    }
+    if (typeof window.loadCommunities === 'function') {
+      window.loadCommunities();
+    }
+    
+  } catch (error) {
+    console.error('Ошибка удаления сообщества:', error);
+    showToast(t('error', currentLang), 'error');
+  }
+};
+
+// Удаление поста
+window.deletePost = async function(postId, commId, authorId) {
+  const auth = window.firebaseAuth;
+  const firestore = window.firebaseFirestore;
+  const firebase = window.firebase;
+  const showToast = window.showToastGlobal;
+  const t = window.tGlobal;
+  const currentLang = window.currentLangGlobal;
+  
+  const user = auth?.currentUser;
+  if (!user) {
+    showToast(t('loginRequired', currentLang), 'warning');
+    return;
+  }
+  
+  try {
+    // Получаем данные поста
+    const postDoc = await firestore.collection('community_posts').doc(commId).collection('posts').doc(postId).get();
+    const postData = postDoc.data();
+    
+    if (!postData) {
+      showToast(t('postNotFound', currentLang) || 'Пост не найден', 'error');
+      return;
+    }
+    
+    // Проверяем, является ли пользователь автором поста или владельцем/админом сообщества
+    const isAuthor = postData.authorId === user.uid;
+    
+    // Проверяем роль пользователя в сообществе
+    let memberDoc = await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).get();
+    let isAdmin = false;
+    if (memberDoc.exists) {
+      const memberData = memberDoc.data();
+      if (memberData.role === 'owner' || memberData.role === 'admin') {
+        isAdmin = true;
+      }
+    }
+    
+    if (!isAuthor && !isAdmin) {
+      showToast(t('cantDeletePost', currentLang) || 'Вы не можете удалить этот пост', 'error');
+      return;
+    }
+    
+    // Подтверждение удаления
+    const confirmed = confirm(t('confirmDeletePost', currentLang) || 'Вы уверены, что хотите удалить этот пост?');
+    
+    if (!confirmed) return;
+    
+    // Удаляем все комментарии поста
+    const commentsSnapshot = await firestore.collection('post_comments')
+      .doc(commId)
+      .collection('posts')
+      .doc(postId)
+      .collection('comments')
+      .get();
+    
+    const deleteCommentPromises = commentsSnapshot.docs.map(commentDoc =>
+      firestore.collection('post_comments')
+        .doc(commId)
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .doc(commentDoc.id)
+        .delete()
+    );
+    await Promise.all(deleteCommentPromises);
+    
+    // Удаляем коллекцию комментариев поста
+    await firestore.collection('post_comments').doc(commId).collection('posts').doc(postId).delete();
+    
+    // Удаляем сам пост
+    await firestore.collection('community_posts').doc(commId).collection('posts').doc(postId).delete();
+    
+    // Уменьшаем счётчик постов
+    await firestore.collection('communities').doc(commId).update({
+      postsCount: firebase.firestore.FieldValue.increment(-1)
+    });
+    
+    showToast(t('postDeleted', currentLang) || 'Пост удалён', 'success');
+    
+    // Закрываем модалку поста и обновляем посты
+    if (typeof window.closeViewPostModal === 'function') {
+      window.closeViewPostModal();
+    }
+    if (typeof window.loadCommunityPosts === 'function') {
+      window.loadCommunityPosts(commId);
+    }
+    
+  } catch (error) {
+    console.error('Ошибка удаления поста:', error);
+    showToast(t('error', currentLang), 'error');
+  }
+};
+
+// Выход из сообщества
+window.leaveCommunity = async function(commId) {
+  const auth = window.firebaseAuth;
+  const firestore = window.firebaseFirestore;
+  const firebase = window.firebase;
+  const showToast = window.showToastGlobal;
+  const t = window.tGlobal;
+  const currentLang = window.currentLangGlobal;
+  
+  const user = auth?.currentUser;
+  if (!user) {
+    showToast(t('loginRequired', currentLang), 'warning');
+    return;
+  }
+  
+  try {
+    // Проверяем, является ли пользователь владельцем
+    const commDoc = await firestore.collection('communities').doc(commId).get();
+    const commData = commDoc.data();
+    
+    if (commData && commData.ownerId === user.uid) {
+      showToast(t('ownerCantLeave', currentLang) || 'Владелец не может выйти из сообщества. Удалите сообщество вместо этого.', 'warning');
+      return;
+    }
+    
+    // Подтверждение
+    const confirmed = confirm(t('confirmLeaveCommunity', currentLang) || 'Вы уверены, что хотите выйти из сообщества?');
+    
+    if (!confirmed) return;
+    
+    // Удаляем из участников
+    await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).delete();
+    
+    // Удаляем из списка сообществ пользователя
+    await firestore.collection('user_communities').doc(user.uid).collection('communities').doc(commId).delete();
+    
+    // Уменьшаем счётчик участников
+    await firestore.collection('communities').doc(commId).update({
+      membersCount: firebase.firestore.FieldValue.increment(-1)
+    });
+    
+    showToast(t('leftCommunity', currentLang) || 'Вы вышли из сообщества', 'success');
+    
+    // Закрываем модалку
+    if (typeof window.closeViewCommunityModal === 'function') {
+      window.closeViewCommunityModal();
+    }
+    
+  } catch (error) {
+    console.error('Ошибка выхода из сообщества:', error);
+    showToast(t('error', currentLang), 'error');
   }
 };
