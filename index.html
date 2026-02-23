@@ -11,6 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-storage-compat.js"></script>
   
@@ -57,7 +58,8 @@
         <form id="register-form" class="auth-form">
           <div class="form-group">
             <i class="fas fa-user"></i>
-            <input type="text" id="register-name" data-i18n-placeholder="authName" placeholder="Имя" required>
+            <input type="text" id="register-name" data-i18n-placeholder="authName" placeholder="Имя" required maxlength="15">
+            <span class="input-hint" id="name-hint">0/15</span>
           </div>
           <div class="form-group">
             <i class="fas fa-envelope"></i>
@@ -74,6 +76,28 @@
           <div id="register-error" class="auth-error"></div>
           <button type="submit" class="auth-btn" data-i18n="authSignUp">
             <i class="fas fa-user-plus"></i> Зарегистрироваться
+          </button>
+        </form>
+
+        <!-- Форма подтверждения email -->
+        <form id="verify-form" class="auth-form">
+          <div class="verify-info">
+            <i class="fas fa-envelope-open-text"></i>
+            <p data-i18n="verifyInfo">На ваш email был отправлен код подтверждения. Пожалуйста, введите его ниже.</p>
+          </div>
+          <div class="form-group">
+            <i class="fas fa-key"></i>
+            <input type="text" id="verify-code" data-i18n-placeholder="verifyCode" placeholder="Код подтверждения" required maxlength="6">
+          </div>
+          <div id="verify-error" class="auth-error"></div>
+          <button type="submit" class="auth-btn" data-i18n="verifySubmit">
+            <i class="fas fa-check"></i> Подтвердить
+          </button>
+          <button type="button" id="resend-code" class="auth-btn secondary" data-i18n="verifyResend">
+            <i class="fas fa-redo"></i> Отправить код повторно
+          </button>
+          <button type="button" id="cancel-verify" class="auth-btn cancel" data-i18n="verifyCancel">
+            <i class="fas fa-times"></i> Отмена
           </button>
         </form>
       </div>
@@ -122,6 +146,7 @@
       <button class="tab" data-tab="hitbox"><i class="fas fa-vector-square"></i> <span class="tab-text" data-i18n="tabHitbox">Хитбокс</span></button>
       <button class="tab" data-tab="server"><i class="fas fa-server"></i> <span class="tab-text" data-i18n="tabServer">Сервер</span></button>
       <button class="tab" data-tab="time"><i class="fas fa-clock"></i> <span class="tab-text" data-i18n="tabTime">Время</span></button>
+      <button class="tab" data-tab="communities"><i class="fas fa-users"></i> <span class="tab-text" data-i18n="tabCommunities">Сообщества</span></button>
     </div>
 
     <!-- Контейнер контента вкладок -->
@@ -188,6 +213,7 @@
               Player.sendMessage(text);
             </div>
           </div>
+          
 
           <div class="api-method">
             <div class="api-method-name" data-i18n="playerApiGetServerPlayer">getServerPlayer()</div>
@@ -312,6 +338,24 @@
             <div class="api-code-block">
               <span class="comment">// пример:</span><br>
               let list = Server.getOnlinePlayer();
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name" data-i18n="serverApiGetOnlinePlayer">getOnlinePlayer()</div>
+            <div class="api-method-description" data-i18n="serverApiGetOnlinePlayerDesc">Получить список игроков (имена)</div>
+            <div class="api-code-block">
+              <span class="comment">// пример:</span><br>
+              let list = Server.getOnlinePlayer();
+            </div>
+          </div>
+
+          <div class="api-method">
+            <div class="api-method-name" data-i18n="">getPlayerCount()</div>
+            <div class="api-method-description" data-i18n="serverApiGetOnlinePlayerDesc">Получить число игроков на сервере</div>
+            <div class="api-code-block">
+              <span class="comment">// пример:</span><br>
+              let count = Server.getPlayerCount();
             </div>
           </div>
 
@@ -552,8 +596,8 @@
             </div>
 
             <div class="settings-option">
-              <label data-i18n="settingsNickname">Никнейм</label>
-              <input type="text" id="settings-nickname" class="settings-input" data-i18n-placeholder="settingsNickname" placeholder="Ваш никнейм">
+              <label data-i18n="settingsNickname">Никнейм <span class="char-counter" id="settings-nickname-counter">0/15</span></label>
+              <input type="text" id="settings-nickname" class="settings-input" data-i18n-placeholder="settingsNickname" placeholder="Ваш никнейм" maxlength="15">
               <button id="update-settings-nickname" class="update-btn" data-i18n="settingsSaveNickname">Сохранить никнейм</button>
             </div>
             
@@ -564,8 +608,8 @@
             </div>
             
             <div class="settings-option">
-              <label data-i18n="settingsDescription">Описание профиля</label>
-              <textarea id="settings-description" class="settings-textarea" data-i18n-placeholder="settingsDescription" placeholder="Расскажите о себе..."></textarea>
+              <label data-i18n="settingsDescription">Описание профиля <span class="char-counter" id="settings-description-counter">0/100</span></label>
+              <textarea id="settings-description" class="settings-textarea" data-i18n-placeholder="settingsDescription" placeholder="Расскажите о себе..." maxlength="100"></textarea>
               <button id="update-description" class="update-btn" data-i18n="settingsSaveDescription">Сохранить описание</button>
             </div>
           </div>
@@ -614,6 +658,39 @@
           </div>
         </div>
       </div>
+
+      <!-- Вкладка Сообщества -->
+      <div id="communities" class="tab-content">
+        <h2 class="content-title"><i class="fas fa-users"></i> <span data-i18n="communitiesTitle">Сообщества</span></h2>
+        
+        <!-- Кнопки управления сообществами -->
+        <div class="communities-actions" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="create-community-btn" class="auth-btn" style="width: auto; padding: 12px 25px;">
+            <i class="fas fa-plus"></i> <span data-i18n="createCommunity">Создать сообщество</span>
+          </button>
+          <button id="my-communities-btn" class="auth-btn secondary" style="width: auto; padding: 12px 25px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);">
+            <i class="fas fa-user"></i> <span data-i18n="myCommunities">Мои сообщества</span>
+          </button>
+          <button id="all-communities-btn" class="auth-btn secondary" style="width: auto; padding: 12px 25px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);">
+            <i class="fas fa-globe"></i> <span data-i18n="allCommunities">Все сообщества</span>
+          </button>
+        </div>
+
+        <!-- Поиск сообществ -->
+        <div class="search-container" style="margin-bottom: 20px;">
+          <div class="search-box">
+            <input type="text" id="community-search-input" class="search-input" data-i18n-placeholder="communitySearchPlaceholder" placeholder="Поиск сообществ...">
+            <button id="community-search-btn" class="search-btn"><i class="fas fa-search"></i></button>
+          </div>
+        </div>
+
+        <!-- Сетка сообществ -->
+        <div id="communities-grid" class="users-grid">
+          <p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1;" data-i18n="communitiesLoading">
+            Загрузка сообществ...
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -650,6 +727,180 @@
         <button class="confirm-btn confirm-cancel" data-i18n="confirmCancel">Отмена</button>
         <button class="confirm-btn confirm-ok" data-i18n="confirmOk">Подтвердить</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно создания сообщества -->
+  <div id="community-modal" class="modal">
+    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+    <div class="modal-content" style="max-width: 600px;">
+      <button class="modal-close" onclick="closeCommunityModal()"><i class="fas fa-times"></i></button>
+      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-users"></i> <span data-i18n="createCommunityTitle">Создание сообщества</span></h2>
+      
+      <form id="create-community-form">
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityName">Название сообщества</label>
+          <input type="text" id="community-name" class="settings-input" required maxlength="50" style="width: 100%;">
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityDescription">Описание</label>
+          <textarea id="community-description" class="settings-textarea" maxlength="200" style="width: 100%; min-height: 80px;"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityAvatar">Ссылка на аватар</label>
+          <input type="text" id="community-avatar" class="settings-input" style="width: 100%;">
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityCover">Ссылка на обложку</label>
+          <input type="text" id="community-cover" class="settings-input" style="width: 100%;">
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityCategory">Категория</label>
+          <select id="community-category" class="settings-select" style="width: 100%;">
+            <option value="gaming" data-i18n="categoryGaming">Игры</option>
+            <option value="tech" data-i18n="categoryTech">Технологии</option>
+            <option value="art" data-i18n="categoryArt">Искусство</option>
+            <option value="music" data-i18n="categoryMusic">Музыка</option>
+            <option value="science" data-i18n="categoryScience">Наука</option>
+            <option value="other" data-i18n="categoryOther">Другое</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityType">Тип сообщества</label>
+          <select id="community-type" class="settings-select" style="width: 100%;">
+            <option value="public" data-i18n="typePublic">Публичное</option>
+            <option value="restricted" data-i18n="typeRestricted">Ограниченное</option>
+            <option value="private" data-i18n="typePrivate">Закрытое</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityTags">Теги (через запятую)</label>
+          <input type="text" id="community-tags" class="settings-input" style="width: 100%;">
+        </div>
+        
+        <div id="community-error" class="auth-error" style="margin-bottom: 15px;"></div>
+        
+        <button type="submit" class="auth-btn" style="width: 100%;">
+          <i class="fas fa-plus"></i> <span data-i18n="createCommunityBtn">Создать сообщество</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно просмотра сообщества (посты, участники) -->
+  <div id="view-community-modal" class="modal">
+    <div class="modal-background" id="view-community-bg" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+    <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close" onclick="closeViewCommunityModal()"><i class="fas fa-times"></i></button>
+      <div id="view-community-content">
+        <!-- Заполняется динамически -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно создания поста -->
+  <div id="post-modal" class="modal">
+    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+    <div class="modal-content" style="max-width: 600px;">
+      <button class="modal-close" onclick="closePostModal()"><i class="fas fa-times"></i></button>
+      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-pen"></i> <span data-i18n="createPostTitle">Создание поста</span></h2>
+      
+      <form id="create-post-form">
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="postTitle">Заголовок</label>
+          <input type="text" id="post-title" class="settings-input" required maxlength="100" style="width: 100%;">
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="postContent">Содержание</label>
+          <textarea id="post-content" class="settings-textarea" required maxlength="5000" style="width: 100%; min-height: 150px;"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="postImage">Ссылка на изображение (необязательно)</label>
+          <input type="text" id="post-image" class="settings-input" style="width: 100%;">
+        </div>
+        
+        <div id="post-error" class="auth-error" style="margin-bottom: 15px;"></div>
+        
+        <button type="submit" class="auth-btn" style="width: 100%;">
+          <i class="fas fa-paper-plane"></i> <span data-i18n="createPostBtn">Опубликовать</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно просмотра поста с комментариями -->
+  <div id="view-post-modal" class="modal">
+    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+    <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close" onclick="closeViewPostModal()"><i class="fas fa-times"></i></button>
+      <div id="view-post-content">
+        <!-- Заполняется динамически -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно списка участников -->
+  <div id="members-modal" class="modal">
+    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+    <div class="modal-content" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+      <button class="modal-close" onclick="closeMembersModal()"><i class="fas fa-times"></i></button>
+      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-users"></i> <span data-i18n="communityMembers">Участники</span></h2>
+      <div id="members-list">
+        <!-- Заполняется динамически -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Модальное окно приглашения в сообщество -->
+  <div id="invite-modal" class="modal">
+    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="modal-close" onclick="closeInviteModal()"><i class="fas fa-times"></i></button>
+      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-link"></i> <span data-i18n="inviteLink">Ссылка-приглашение</span></h2>
+      
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div id="invite-community-name" style="color: white; font-size: 1.2rem; margin-bottom: 10px;"></div>
+        <p style="color: rgba(255,255,255,0.7);" data-i18n="inviteDescription">Поделитесь этой ссылкой с другими людьми, чтобы они могли присоединиться к сообществу.</p>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <input type="text" id="invite-link" class="settings-input" style="width: 100%; text-align: center;" readonly>
+      </div>
+      
+      <button id="copy-invite-link" class="auth-btn" style="width: 100%; margin-bottom: 10px;">
+        <i class="fas fa-copy"></i> <span data-i18n="copyLink">Копировать ссылку</span>
+      </button>
+      
+      <p id="invite-link-copied" style="color: #2ed573; text-align: center; display: none;" data-i18n="linkCopied">Ссылка скопирована!</p>
+    </div>
+  </div>
+
+  <!-- Модальное окно верификации сообщества -->
+  <div id="verification-modal" class="modal">
+    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+    <div class="modal-content" style="max-width: 400px;">
+      <button class="modal-close" onclick="closeVerificationModal()"><i class="fas fa-times"></i></button>
+      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-check-circle"></i> <span data-i18n="verifyCommunity">Верификация сообщества</span></h2>
+      
+      <div style="text-align: center; margin-bottom: 20px;">
+        <p style="color: rgba(255,255,255,0.8);" data-i18n="verificationInfo">Верифицированные сообщества имеют значок подтверждения и отображаются в результатах поиска выше.</p>
+      </div>
+      
+      <div id="verification-status" style="margin-bottom: 20px;">
+        <!-- Заполняется динамически -->
+      </div>
+      
+      <button id="request-verification-btn" class="auth-btn" style="width: 100%;">
+        <i class="fas fa-paper-plane"></i> <span data-i18n="requestVerification">Подать заявку на верификацию</span>
+      </button>
     </div>
   </div>
 

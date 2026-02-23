@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Разрешаем чтение всем
+    match /communities/{communityId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Участники сообществ
+    match /community_members/{communityId}/members/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Сообщества пользователей
+    match /user_communities/{userId}/communities/{communityId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Посты в сообществах
+    match /community_posts/{communityId}/posts/{postId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Запросы на вступление
+    match /community_requests/{communityId}/requests/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Комментарии к постам
+    match /post_comments/{communityId}/posts/{postId}/comments/{commentId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Запросы верификации
+    match /community_verifications/{communityId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}

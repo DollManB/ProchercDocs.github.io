@@ -15,6 +15,7 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const database = firebase.database();
+  const firestore = firebase.firestore();
   const storage = firebase.storage();
   const analytics = firebase.analytics();
 
@@ -70,6 +71,215 @@
   const deleteAccountBtn = document.getElementById('delete-account');
   const themeBtns = document.querySelectorAll('.theme-btn');
   const languageSelect = document.getElementById('language-select');
+
+  // Элементы верификации email
+  const verifyForm = document.getElementById('verify-form');
+  const verifyCodeInput = document.getElementById('verify-code');
+  const verifyError = document.getElementById('verify-error');
+  const resendCodeBtn = document.getElementById('resend-code');
+  const cancelVerifyBtn = document.getElementById('cancel-verify');
+  const registerNameInput = document.getElementById('register-name');
+  const nameHint = document.getElementById('name-hint');
+  
+  // Переменные для верификации
+  let pendingVerification = null;
+  let verificationCode = null;
+  
+  // Список временных email доменов
+  const disposableEmailDomains = [
+    'tempmail.com', '10minutemail.com', 'guerrillamail.com', 'mailinator.com',
+    'throwaway.email', 'fakeinbox.com', 'trashmail.com', 'getnada.com',
+    'yopmail.com', 'temp-mail.org', 'maildrop.cc', 'dispostable.com',
+    'sharklasers.com', 'spam4.me', 'grr.la', 'mailnesia.com',
+    'mailcatch.com', 'spamfree24.org', 'mintemail.com', 'tempemail.net',
+    'emailondeck.com', 'tempail.com', 'emailfake.com', 'throwawaymail.com',
+    'tempinbox.com', 'mohmal.com', 'temp.email', 'fake-email.com',
+    'mail-temporaire.fr', 'mytrashmail.com', 'spamgourmet.com', 'meltmail.com',
+    'spaml.com', 'spamcowboy.com', 'spamcowboy.net', 'jetable.org',
+    'kasmail.com', 'spammotel.com', 'sogetthis.com', 'mailin8r.com',
+    'mailinator.net', 'sofimail.com', 'spamherlotons.com', 'teddydating.com',
+    'emailwarden.com', 'spamify.com', 'dodgeit.com', 'dodgit.com',
+    'spamjam.com', 'spaml.com', 'spamnator.net', 'mailzilla.com',
+    'mbx.cc', 'emailtemporario.com.br', 'tempemailaddress.com', 'instant-mail.de',
+    'temp-mail.io', 'email-temp.com', 'tmpmail.org', 'tmpmail.net',
+    'tmpmail.com', 'disposeamail.com', 'spamgourmet.org', 'spamlassa.com'
+  ];
+  
+  // Значок бана - используем Font Awesome иконку
+  const BAN_BADGE_ICON = '<i class="fas fa-gavel" style="color: #ff4757; font-size: 14px;"></i>';
+  
+  // ID админа
+  const ADMIN_EMAIL = 'dollmanb1337@gmail.com';
+  
+  // Проверка, является ли пользователь админом
+  function isAdmin(user) {
+    if (!user || !user.email) return false;
+    return user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  }
+  
+  // Функция проверки временного email
+  function isDisposableEmail(email) {
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (!domain) return false;
+    return disposableEmailDomains.includes(domain);
+  }
+  
+  // Функция генерации кода верификации
+  function generateVerificationCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+  
+  // Функция показа формы верификации
+  function showVerifyForm() {
+    // Скрываем все формы авторизации, кроме verify-form
+    authForms.forEach(f => {
+      if (f.id !== 'verify-form') {
+        f.classList.remove('active');
+      }
+    });
+    // Показываем форму верификации
+    verifyForm.classList.add('active');
+    // Скрываем все вкладки
+    authTabs.forEach(t => t.classList.remove('active'));
+  }
+  
+  // Функция возврата к форме регистрации
+  function showRegisterForm() {
+    // Скрываем форму верификации
+    verifyForm.classList.remove('active');
+    // Скрываем все формы
+    authForms.forEach(f => f.classList.remove('active'));
+    // Скрываем все вкладки
+    authTabs.forEach(t => t.classList.remove('active'));
+    // Показываем вкладку регистрации
+    document.querySelector('[data-tab="register"]').classList.add('active');
+    // Показываем форму регистрации
+    registerForm.classList.add('active');
+  }
+  
+  // Счетчик символов для никнейма при регистрации
+  if (registerNameInput && nameHint) {
+    registerNameInput.addEventListener('input', function() {
+      const length = this.value.length;
+      nameHint.textContent = length + '/15';
+      if (length > 15) {
+        nameHint.style.color = '#ff4757';
+      } else if (length > 10) {
+        nameHint.style.color = '#ffa502';
+      } else {
+        nameHint.style.color = 'rgba(255,255,255,0.5)';
+      }
+    });
+  }
+  
+  // Обработчик кнопки отмены верификации
+  if (cancelVerifyBtn) {
+    cancelVerifyBtn.addEventListener('click', async () => {
+      // Удаляем временные данные верификации
+      if (pendingVerification && pendingVerification.tempId) {
+        try {
+          await database.ref('pending_verification/' + pendingVerification.tempId).remove();
+        } catch (e) {
+          console.log('Очистка отменена');
+        }
+      }
+      pendingVerification = null;
+      verificationCode = null;
+      showRegisterForm();
+    });
+  }
+  
+  // Обработчик повторной отправки кода
+  if (resendCodeBtn) {
+    resendCodeBtn.addEventListener('click', async () => {
+      if (!pendingVerification || !pendingVerification.email) {
+        showRegisterForm();
+        return;
+      }
+      
+      resendCodeBtn.disabled = true;
+      resendCodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + t('loading', currentLang) + '...';
+      
+      verificationCode = generateVerificationCode();
+      
+      try {
+        // Обновляем код в БД
+        if (pendingVerification.tempId) {
+          await database.ref('pending_verification/' + pendingVerification.tempId).update({
+            code: verificationCode,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            expires: Date.now() + 15 * 60 * 1000
+          });
+        }
+        
+        showToast(t('verifyCodeSent', currentLang) + ' ' + verificationCode, 'info', 10000);
+        console.log('Код верификации:', verificationCode);
+        
+      } catch (error) {
+        console.error('Ошибка отправки кода:', error);
+        showToast(t('authGenericError', currentLang), 'error');
+      }
+      
+      setTimeout(() => {
+        resendCodeBtn.disabled = false;
+        resendCodeBtn.innerHTML = '<i class="fas fa-redo"></i> ' + t('verifyResend', currentLang);
+      }, 30000);
+    });
+  }
+  
+  // Обработчик формы верификации
+  if (verifyForm) {
+    verifyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const enteredCode = verifyCodeInput.value.trim();
+      
+      if (!enteredCode || !pendingVerification) {
+        verifyError.textContent = t('verifyInvalidCode', currentLang);
+        return;
+      }
+      
+      if (enteredCode === verificationCode) {
+        try {
+          // Создаем пользователя в Firebase Auth после успешной верификации
+          const userCredential = await auth.createUserWithEmailAndPassword(pendingVerification.email, pendingVerification.password);
+          
+          await userCredential.user.updateProfile({
+            displayName: pendingVerification.name
+          });
+          
+          // Создаем данные пользователя в БД
+          await database.ref('users/' + userCredential.user.uid).set({
+            nickname: pendingVerification.name,
+            email: pendingVerification.email,
+            avatar: DEFAULT_AVATAR,
+            background: DEFAULT_BACKGROUND,
+            description: '',
+            premium: false,
+            emailVerified: true,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+          });
+          
+          // Удаляем временные данные верификации
+          if (pendingVerification.tempId) {
+            await database.ref('pending_verification/' + pendingVerification.tempId).remove();
+          }
+          
+          // Выполняем вход
+          await handleAuthSuccess(userCredential.user, 'register');
+          
+          pendingVerification = null;
+          verificationCode = null;
+          
+        } catch (error) {
+          console.error('Ошибка завершения регистрации:', error);
+          verifyError.textContent = getAuthErrorMessage(error.code);
+        }
+      } else {
+        verifyError.textContent = t('verifyInvalidCode', currentLang);
+        setTimeout(() => verifyError.textContent = '', 5000);
+      }
+    });
+  }
 
   // Модальное окно
   const modal = document.getElementById('profile-modal');
@@ -155,18 +365,23 @@
         const premium = userData.premium || false;
         const description = userData.description || t('', currentLang);
         const background = userData.background || DEFAULT_BACKGROUND;
+        const isBanned = userData.banned === true;
+        const banReason = userData.banReason || '';
+        const backgroundModal = userData.backgroundModal || DEFAULT_BACKGROUND;
         
         // Устанавливаем фон модального окна (блюр)
-        if (background.startsWith('http')) {
-          modalBackground.style.background = `url('${background}')`;
+        if (backgroundModal.startsWith('http')) {
+          modalBackground.style.background = `url('${backgroundModal}')`;
         } else {
-          // Для градиентов используем тот же градиент
-          modalBackground.style.background = background;
+          modalBackground.style.background = backgroundModal;
         }
         
         // Проверяем, является ли это профиль текущего пользователя
         const currentUser = auth.currentUser;
         const isOwnProfile = currentUser && currentUser.uid === uid;
+        
+        // Проверяем, является ли текущий пользователь админом
+        const userIsAdmin = isAdmin(currentUser);
         
         // Формируем HTML в зависимости от того, чей это профиль
         let emailHtml = '';
@@ -179,11 +394,52 @@
           `;
         }
         
+        // Определяем класс для никнейма (красный если забанен)
+        const nicknameClass = isBanned ? 'modal-name-banned' : 'modal-name';
+        
+        // Бейджи (премиум и/или бан)
+        let badgesHtml = '';
+        if (isBanned) {
+          badgesHtml += `<span class="modal-ban-badge" title="${t('banReason', currentLang)}: ${banReason}">${BAN_BADGE_ICON}</span>`;
+        }
+        if (premium) {
+          badgesHtml += '<img src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" class="modal-premium-badge">';
+        }
+        
+        // Кнопки админа (если текущий пользователь - админ)
+        let adminButtonsHtml = '';
+        if (userIsAdmin && !isOwnProfile) {
+          if (isBanned) {
+            adminButtonsHtml = `
+              <div class="modal-admin-buttons">
+                <button class="btn-unban" onclick="unbanUser('${uid}')">${t('unbanUser', currentLang)}</button>
+              </div>
+            `;
+          } else {
+            adminButtonsHtml = `
+              <div class="modal-admin-buttons">
+                <button class="btn-ban" onclick="showBanDialog('${uid}', '${nickname.replace(/'/g, "\\'")}')">${t('banUser', currentLang)}</button>
+              </div>
+            `;
+          }
+        }
+        
+        // Если пользователь забанен, показываем причину
+        let banInfoHtml = '';
+        if (isBanned && banReason) {
+          banInfoHtml = `
+            <div class="modal-detail ban-reason">
+              <div class="modal-detail-label"><i class="fas fa-gavel"></i> ${t('banReason', currentLang)}</div>
+              <div class="modal-detail-value">${banReason}</div>
+            </div>
+          `;
+        }
+        
         modalProfile.innerHTML = `
           <img src="${avatar}" class="modal-avatar" alt="Avatar">
-          <div class="modal-name">
+          <div class="${nicknameClass}">
             ${nickname}
-            ${premium ? '<img src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" class="modal-premium-badge">' : ''}
+            ${badgesHtml ? '<div class="badges-container">' + badgesHtml + '</div>' : ''}
           </div>
           ${emailHtml}
           <div class="modal-detail">
@@ -194,6 +450,8 @@
             <div class="modal-detail-label"><i class="fas fa-crown"></i> ${t('profilePremium', currentLang)}</div>
             <div class="modal-detail-value">${premium ? t('profileActive', currentLang) : t('profileNotActive', currentLang)}</div>
           </div>
+          ${banInfoHtml}
+          ${adminButtonsHtml}
         `;
         
         modal.classList.add('active');
@@ -226,7 +484,7 @@
     });
   });
 
-  // Форма входа
+  // Форма входа (без проверки emailVerified, т.к. используем кастомную верификацию)
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
@@ -245,8 +503,12 @@
           background: DEFAULT_BACKGROUND,
           description: '',
           premium: false,
+          emailVerified: true,
           createdAt: firebase.database.ServerValue.TIMESTAMP
         });
+      } else {
+        // Обновляем статус верификации в БД
+        await database.ref('users/' + userCredential.user.uid + '/emailVerified').set(true);
       }
       
       await handleAuthSuccess(userCredential.user, 'login');
@@ -256,21 +518,50 @@
     }
   });
 
-  // Форма регистрации
+  // Форма регистрации с кастомной верификацией через код
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('register-name').value;
-    const email = document.getElementById('register-email').value;
+    const name = document.getElementById('register-name').value.trim();
+    const email = document.getElementById('register-email').value.trim().toLowerCase();
     const password = document.getElementById('register-password').value;
     const confirmPassword = document.getElementById('register-confirm').value;
+    
+    // Валидация никнейма
+    if (name.length > 15) {
+      registerError.textContent = t('nicknameTooLong', currentLang);
+      return;
+    }
+    
+    if (!name) {
+      registerError.textContent = t('enterNickname', currentLang);
+      return;
+    }
+    
+    // Валидация email
+    if (!email || !email.includes('@')) {
+      registerError.textContent = t('emailNotValid', currentLang);
+      return;
+    }
+    
+    // Проверка на временный email
+    if (isDisposableEmail(email)) {
+      registerError.textContent = t('disposableEmail', currentLang);
+      return;
+    }
     
     if (password !== confirmPassword) {
       registerError.textContent = t('passwordsNotMatch', currentLang);
       return;
     }
     
+    // Валидация пароля (минимум 6 символов)
+    if (password.length < 6) {
+      registerError.textContent = t('authWeakPassword', currentLang);
+      return;
+    }
+    
     try {
-      // Проверяем, существует ли уже пользователь с таким никнеймом
+      // Проверяем, существует ли пользователь с таким никнеймом в БД
       const usersRef = database.ref('users');
       const snapshot = await usersRef.once('value');
       const users = snapshot.val();
@@ -281,27 +572,47 @@
             registerError.textContent = t('nicknameExists', currentLang);
             return;
           }
+          // Также проверяем email
+          if (userData.email && userData.email.toLowerCase() === email) {
+            registerError.textContent = t('authEmailInUse', currentLang);
+            return;
+          }
         }
       }
       
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      // Генерируем код верификации
+      const verifyCode = generateVerificationCode();
+      const tempId = 'temp_' + Date.now();
       
-      await userCredential.user.updateProfile({
-        displayName: name
-      });
-      
-      await database.ref('users/' + userCredential.user.uid).set({
+      // Сохраняем данные для верификации во временном узле
+      await database.ref('pending_verification/' + tempId).set({
         nickname: name,
         email: email,
-        avatar: DEFAULT_AVATAR,
-        background: DEFAULT_BACKGROUND,
-        description: '',
-        premium: false,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
+        password: password,
+        code: verifyCode,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        expires: Date.now() + 15 * 60 * 1000 // 15 минут
       });
       
-      await handleAuthSuccess(userCredential.user, 'register');
+      // Сохраняем временные данные для использования при подтверждении
+      pendingVerification = {
+        tempId: tempId,
+        email: email,
+        password: password,
+        name: name
+      };
+      verificationCode = verifyCode;
+      
+      // Показываем форму верификации
+      showVerifyForm();
+      
+      // Для демонстрации - показываем код в консоли и уведомлении
+      // В реальном приложении код отправляется на email через SMTP
+      console.log('Код верификации для', email + ':', verifyCode);
+      showToast(t('verifyCodeSent', currentLang) + ' (код: ' + verifyCode + ')', 'info', 15000);
+      
     } catch (error) {
+      console.error('Ошибка регистрации:', error);
       registerError.textContent = getAuthErrorMessage(error.code);
       setTimeout(() => registerError.textContent = '', 5000);
     }
@@ -337,6 +648,38 @@
     }
   });
 
+  // Счетчик символов для никнейма в настройках
+  const settingsNicknameCounter = document.getElementById('settings-nickname-counter');
+  if (settingsNickname && settingsNicknameCounter) {
+    settingsNickname.addEventListener('input', function() {
+      const length = this.value.length;
+      settingsNicknameCounter.textContent = length + '/15';
+      if (length > 15) {
+        settingsNicknameCounter.style.color = '#ff4757';
+      } else if (length > 10) {
+        settingsNicknameCounter.style.color = '#ffa502';
+      } else {
+        settingsNicknameCounter.style.color = 'rgba(255,255,255,0.5)';
+      }
+    });
+  }
+  
+  // Счетчик символов для описания в настройках
+  const settingsDescriptionCounter = document.getElementById('settings-description-counter');
+  if (settingsDescription && settingsDescriptionCounter) {
+    settingsDescription.addEventListener('input', function() {
+      const length = this.value.length;
+      settingsDescriptionCounter.textContent = length + '/100';
+      if (length > 100) {
+        settingsDescriptionCounter.style.color = '#ff4757';
+      } else if (length > 80) {
+        settingsDescriptionCounter.style.color = '#ffa502';
+      } else {
+        settingsDescriptionCounter.style.color = 'rgba(255,255,255,0.5)';
+      }
+    });
+  }
+  
   // Обновление никнейма
   updateSettingsNickname.addEventListener('click', async () => {
     const user = auth.currentUser;
@@ -345,6 +688,12 @@
     const newNickname = settingsNickname.value.trim();
     if (!newNickname) {
       showToast(t('enterNickname', currentLang), 'warning');
+      return;
+    }
+    
+    // Валидация никнейма
+    if (newNickname.length > 15) {
+      showToast(t('nicknameTooLong', currentLang), 'warning');
       return;
     }
     
@@ -556,13 +905,26 @@
       
       let html = '';
       results.forEach(user => {
+        const isBanned = user.banned === true;
+        const nicknameHtml = isBanned 
+          ? `<span style="color: #ff4757; text-shadow: 0 0 10px rgba(255,71,87,0.5);">${user.nickname}</span>`
+          : user.nickname;
+        
+        let badgesHtml = '';
+        if (isBanned) {
+          badgesHtml += `<span title="${t('banned', currentLang)}" style="filter: drop-shadow(0 0 5px #ff4757);">${BAN_BADGE_ICON}</span>`;
+        }
+        if (user.premium) {
+          badgesHtml += `<img src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" class="premium-badge">`;
+        }
+        
         html += `
           <div class="user-card" onclick="openUserProfile('${user.uid}')">
-            <img src="${user.avatar || DEFAULT_AVATAR}" class="user-avatar" alt="Avatar">
+            <img src="${user.avatar || DEFAULT_AVATAR}" class="user-avatar" alt="Avatar" style="${isBanned ? 'border-color: #ff4757;' : ''}">
             <div class="user-info">
               <div class="user-name">
-                ${user.nickname}
-                ${user.premium ? '<img src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" class="premium-badge">' : ''}
+                ${nicknameHtml}
+                ${badgesHtml}
               </div>
               ${user.description ? `<div class="user-description">${user.description.substring(0, 50)}${user.description.length > 50 ? '...' : ''}</div>` : ''}
             </div>
@@ -748,6 +1110,11 @@
         tab.classList.add('active');
       }
     });
+    
+    // Загружаем сообщества при переходе на вкладку
+    if (tabId === 'communities') {
+      loadCommunities();
+    }
 
     if (analytics) {
       analytics.logEvent('tab_switch', {
@@ -767,6 +1134,1012 @@
   });
 
   switchTab('player');
+
+  // ============ СООБЩЕСТВА (FIRESTORE) ============
+  
+  // Элементы сообществ
+  const communityModal = document.getElementById('community-modal');
+  const createCommunityForm = document.getElementById('create-community-form');
+  const createCommunityBtn = document.getElementById('create-community-btn');
+  const myCommunitiesBtn = document.getElementById('my-communities-btn');
+  const allCommunitiesBtn = document.getElementById('all-communities-btn');
+  const communitySearchInput = document.getElementById('community-search-input');
+  const communitySearchBtn = document.getElementById('community-search-btn');
+  const communitiesGrid = document.getElementById('communities-grid');
+  const communityError = document.getElementById('community-error');
+  
+  // Дефолтные значения для сообществ
+  const DEFAULT_COMMUNITY_AVATAR = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s';
+  const DEFAULT_COMMUNITY_COVER = 'radial-gradient(circle at 20% 30%, #1a1a2e, #16213e, #0f3460)';
+  
+  // Текущий режим отображения сообществ
+  let communitiesViewMode = 'all'; // 'all', 'my'
+  
+  // Функция открытия модального окна сообщества
+  window.openCommunityModal = function() {
+    if (!auth.currentUser) {
+      showToast(t('loginRequired', currentLang), 'warning');
+      return;
+    }
+    communityModal.classList.add('active');
+  };
+  
+  // Функция закрытия модального окна сообщества
+  window.closeCommunityModal = function() {
+    communityModal.classList.remove('active');
+    createCommunityForm.reset();
+    communityError.textContent = '';
+  };
+  
+  // Открытие модального окна создания сообщества
+  if (createCommunityBtn) {
+    createCommunityBtn.addEventListener('click', openCommunityModal);
+  }
+  
+  // Закрытие по клику вне модального окна
+  communityModal.addEventListener('click', (e) => {
+    if (e.target === communityModal) {
+      closeCommunityModal();
+    }
+  });
+  
+  // Создание сообщества в Firestore
+  if (createCommunityForm) {
+    createCommunityForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const user = auth.currentUser;
+      if (!user) {
+        communityError.textContent = t('loginRequired', currentLang);
+        return;
+      }
+      
+      const name = document.getElementById('community-name').value.trim();
+      const description = document.getElementById('community-description').value.trim();
+      const avatar = document.getElementById('community-avatar').value.trim() || DEFAULT_COMMUNITY_AVATAR;
+      const cover = document.getElementById('community-cover').value.trim() || DEFAULT_COMMUNITY_COVER;
+      const category = document.getElementById('community-category').value;
+      const type = document.getElementById('community-type').value;
+      const tagsStr = document.getElementById('community-tags').value.trim();
+      const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+      
+      if (!name) {
+        communityError.textContent = t('communityNameRequired', currentLang);
+        return;
+      }
+      
+      if (name.length > 50) {
+        communityError.textContent = t('communityNameTooLong', currentLang);
+        return;
+      }
+      
+      try {
+        // Проверяем уникальность названия в Firestore
+        const communitiesSnapshot = await firestore.collection('communities').where('nameLower', '==', name.toLowerCase()).get();
+        if (!communitiesSnapshot.empty) {
+          communityError.textContent = t('communityNameExists', currentLang);
+          return;
+        }
+        
+        // Создаём документ сообщества в Firestore
+        const commDocRef = firestore.collection('communities').doc();
+        const commId = commDocRef.id;
+        const now = firebase.firestore.FieldValue.serverTimestamp();
+        
+        await commDocRef.set({
+          id: commId,
+          name: name,
+          nameLower: name.toLowerCase(),
+          description: description,
+          avatar: avatar,
+          cover: cover,
+          category: category,
+          type: type,
+          tags: tags,
+          ownerId: user.uid,
+          ownerName: headerNickname.textContent,
+          createdAt: now,
+          membersCount: 1,
+          postsCount: 0,
+          verified: false
+        });
+        
+        // Добавляем владельца в участники
+        await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).set({
+          role: 'owner',
+          joinedAt: now,
+          nickname: headerNickname.textContent
+        });
+        
+        // Добавляем сообщество в список участков пользователя
+        await firestore.collection('user_communities').doc(user.uid).collection('communities').doc(commId).set({
+          role: 'owner',
+          joinedAt: now
+        });
+        
+        closeCommunityModal();
+        showToast(t('communityCreated', currentLang), 'success');
+        loadCommunities();
+        
+      } catch (error) {
+        console.error('Ошибка создания сообщества:', error);
+        communityError.textContent = t('communityCreateError', currentLang);
+      }
+    });
+  }
+  
+  // Загрузка сообществ из Firestore
+  async function loadCommunities() {
+    if (!communitiesGrid) return;
+    
+    communitiesGrid.innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1;">' + t('loading', currentLang) + '...</p>';
+    
+    try {
+      const user = auth.currentUser;
+      let filteredCommunities = [];
+      
+      if (communitiesViewMode === 'my' && user) {
+        // Загружаем сообщества пользователя
+        const userCommsSnapshot = await firestore.collection('user_communities').doc(user.uid).collection('communities').get();
+        if (!userCommsSnapshot.empty) {
+          for (const doc of userCommsSnapshot.docs) {
+            const commDoc = await firestore.collection('communities').doc(doc.id).get();
+            if (commDoc.exists) {
+              filteredCommunities.push({ id: doc.id, ...commDoc.data() });
+            }
+          }
+        }
+      } else {
+        // Загружаем все публичные сообщества
+        const allCommsSnapshot = await firestore.collection('communities').where('type', '==', 'public').get();
+        allCommsSnapshot.forEach(doc => {
+          filteredCommunities.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Добавляем сообщества, где пользователь состоит (для непубличных)
+        if (user) {
+          const userCommsSnapshot = await firestore.collection('user_communities').doc(user.uid).collection('communities').get();
+          for (const doc of userCommsSnapshot.docs) {
+            const commDoc = await firestore.collection('communities').doc(doc.id).get();
+            if (commDoc.exists) {
+              const commData = commDoc.data();
+              // Проверяем, не добавлено ли уже
+              if (!filteredCommunities.find(c => c.id === doc.id)) {
+                filteredCommunities.push({ id: doc.id, ...commData });
+              }
+            }
+          }
+        }
+      }
+      
+      // Поиск по названию
+      const searchTerm = communitySearchInput?.value.trim().toLowerCase();
+      if (searchTerm) {
+        filteredCommunities = filteredCommunities.filter(comm => 
+          comm.name?.toLowerCase().includes(searchTerm) || 
+          comm.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
+        );
+      }
+      
+      if (filteredCommunities.length === 0) {
+        communitiesGrid.innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1;">' + t('noCommunitiesFound', currentLang) + '</p>';
+        return;
+      }
+      
+      let html = '';
+      filteredCommunities.forEach(comm => {
+        const typeIcons = {
+          'public': '<i class="fas fa-globe"></i>',
+          'restricted': '<i class="fas fa-user-lock"></i>',
+          'private': '<i class="fas fa-lock"></i>'
+        };
+        
+        const categoryKey = 'category' + comm.category.charAt(0).toUpperCase() + comm.category.slice(1);
+        
+        html += `
+          <div class="user-card" onclick="viewCommunity('${comm.id}')">
+            <img src="${comm.avatar || DEFAULT_COMMUNITY_AVATAR}" class="user-avatar" alt="Avatar">
+            <div class="user-info">
+              <div class="user-name">
+                ${comm.name}
+                ${comm.verified ? '<i class="fas fa-check-circle" style="color: #2ed573; margin-left: 5px;" title="' + t('verified', currentLang) + '"></i>' : ''}
+                ${typeIcons[comm.type] || ''}
+              </div>
+              <div class="user-description">${comm.description ? comm.description.substring(0, 50) + (comm.description.length > 50 ? '...' : '') : ''}</div>
+              <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">
+                <i class="fas fa-users"></i> ${comm.membersCount || 0} | <i class="fas fa-folder"></i> ${t(categoryKey, currentLang) || comm.category}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      communitiesGrid.innerHTML = html;
+      
+    } catch (error) {
+      console.error('Ошибка загрузки сообществ:', error);
+      communitiesGrid.innerHTML = '<p style="color: #ff4757; text-align: center; grid-column: 1/-1;">' + t('communitiesLoadError', currentLang) + '</p>';
+    }
+  }
+  
+  // Кнопки переключения режимов
+  if (myCommunitiesBtn) {
+    myCommunitiesBtn.addEventListener('click', () => {
+      communitiesViewMode = 'my';
+      myCommunitiesBtn.style.background = 'linear-gradient(135deg, #6e8efb, #a777e3)';
+      allCommunitiesBtn.style.background = 'rgba(255,255,255,0.1)';
+      loadCommunities();
+    });
+  }
+  
+  if (allCommunitiesBtn) {
+    allCommunitiesBtn.addEventListener('click', () => {
+      communitiesViewMode = 'all';
+      allCommunitiesBtn.style.background = 'linear-gradient(135deg, #6e8efb, #a777e3)';
+      myCommunitiesBtn.style.background = 'rgba(255,255,255,0.1)';
+      loadCommunities();
+    });
+  }
+  
+  // Поиск сообществ
+  if (communitySearchBtn) {
+    communitySearchBtn.addEventListener('click', loadCommunities);
+  }
+  
+  if (communitySearchInput) {
+    communitySearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        loadCommunities();
+      }
+    });
+  }
+  
+  // Функция просмотра сообщества
+  window.viewCommunity = async function(commId) {
+    const user = auth.currentUser;
+    if (!user) {
+      showToast(t('loginRequired', currentLang), 'warning');
+      return;
+    }
+    
+    // Проверяем, является ли пользователь участником
+    const memberDoc = await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).get();
+    const isMember = memberDoc.exists;
+    
+    if (isMember) {
+      openViewCommunityModal(commId);
+    } else {
+      // Получаем информацию о сообществе
+      const commDoc = await firestore.collection('communities').doc(commId).get();
+      const comm = commDoc.data();
+      
+      if (!comm) return;
+      
+      if (comm.type === 'public') {
+        const now = firebase.firestore.FieldValue.serverTimestamp();
+        // Автоматически присоединяемся к публичному
+        await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).set({
+          role: 'member',
+          joinedAt: now,
+          nickname: headerNickname.textContent
+        });
+        
+        await firestore.collection('user_communities').doc(user.uid).collection('communities').doc(commId).set({
+          role: 'member',
+          joinedAt: now
+        });
+        
+        // Увеличиваем счётчик участников
+        await firestore.collection('communities').doc(commId).update({
+          membersCount: firebase.firestore.FieldValue.increment(1)
+        });
+        
+        showToast(t('joinedCommunity', currentLang), 'success');
+        loadCommunities();
+        openViewCommunityModal(commId);
+      } else if (comm.type === 'restricted') {
+        // Для ограниченного - подаём заявку
+        await firestore.collection('community_requests').doc(commId).collection('requests').doc(user.uid).set({
+          nickname: headerNickname.textContent,
+          requestedAt: now,
+          status: 'pending'
+        });
+        
+        showToast(t('requestSent', currentLang), 'info');
+      } else {
+        showToast(t('communityPrivate', currentLang), 'warning');
+      }
+    }
+  };
+
+  // ============ ПОСТЫ В СООБЩЕСТВАХ ============
+  
+  // Элементы для постов
+  let currentViewCommunityId = null;
+  let currentViewPostId = null;
+  
+  // Модальные окна постов
+  const viewCommunityModal = document.getElementById('view-community-modal');
+  const viewCommunityContent = document.getElementById('view-community-content');
+  const postModal = document.getElementById('post-modal');
+  const createPostForm = document.getElementById('create-post-form');
+  const viewPostModal = document.getElementById('view-post-modal');
+  const viewPostContent = document.getElementById('view-post-content');
+  const membersModal = document.getElementById('members-modal');
+  const membersList = document.getElementById('members-list');
+  const inviteModal = document.getElementById('invite-modal');
+  const verificationModal = document.getElementById('verification-modal');
+  
+  // Текущее выбранное сообщество для создания поста
+  let selectedCommunityForPost = null;
+  
+  // Открытие модального окна просмотра сообщества
+  window.openViewCommunityModal = function(commId) {
+    currentViewCommunityId = commId;
+    viewCommunityModal.classList.add('active');
+    loadCommunityPosts(commId);
+  };
+  
+  // Закрытие модального окна просмотра сообщества
+  window.closeViewCommunityModal = function() {
+    viewCommunityModal.classList.remove('active');
+    currentViewCommunityId = null;
+  };
+  
+  // Открытие модального окна создания поста
+  window.openPostModal = function(commId) {
+    const user = auth.currentUser;
+    if (!user) {
+      showToast(t('loginRequired', currentLang), 'warning');
+      return;
+    }
+    
+    selectedCommunityForPost = commId;
+    postModal.classList.add('active');
+  };
+  
+  // Закрытие модального окна создания поста
+  window.closePostModal = function() {
+    postModal.classList.remove('active');
+    createPostForm.reset();
+    selectedCommunityForPost = null;
+    document.getElementById('post-error').textContent = '';
+  };
+  
+  // Открытие модального окна просмотра поста
+  window.openViewPostModal = function(postId, commId) {
+    currentViewPostId = postId;
+    viewPostModal.classList.add('active');
+    loadPostWithComments(postId, commId);
+  };
+  
+  // Закрытие модального окна просмотра поста
+  window.closeViewPostModal = function() {
+    viewPostModal.classList.remove('active');
+    currentViewPostId = null;
+  };
+  
+  // Открытие модального окна участников
+  window.openMembersModal = function(commId) {
+    membersModal.classList.add('active');
+    loadCommunityMembers(commId);
+  };
+  
+  // Закрытие модального окна участников
+  window.closeMembersModal = function() {
+    membersModal.classList.remove('active');
+  };
+  
+  // Открытие модального окна приглашения
+  window.openInviteModal = function(commId, commName) {
+    document.getElementById('invite-community-name').textContent = commName;
+    const inviteLink = window.location.origin + window.location.pathname + '?join=' + commId;
+    document.getElementById('invite-link').value = inviteLink;
+    inviteModal.classList.add('active');
+  };
+  
+  // Закрытие модального окна приглашения
+  window.closeInviteModal = function() {
+    inviteModal.classList.remove('active');
+    document.getElementById('invite-link-copied').style.display = 'none';
+  };
+  
+  // Открытие модального окна верификации
+  window.openVerificationModal = function(commId, commName, isVerified, isOwner) {
+    const statusDiv = document.getElementById('verification-status');
+    const requestBtn = document.getElementById('request-verification-btn');
+    
+    if (isVerified) {
+      statusDiv.innerHTML = `
+        <div style="text-align: center; padding: 15px; background: rgba(46, 213, 115, 0.2); border-radius: 10px;">
+          <i class="fas fa-check-circle" style="color: #2ed573; font-size: 2rem; margin-bottom: 10px;"></i>
+          <p style="color: #2ed573; font-weight: bold;">${t('communityVerified', currentLang)}</p>
+          <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">${t('communityVerifiedDesc', currentLang)}</p>
+        </div>
+      `;
+      requestBtn.style.display = 'none';
+    } else if (!isOwner) {
+      statusDiv.innerHTML = `
+        <div style="text-align: center; padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 10px;">
+          <i class="fas fa-info-circle" style="color: #ffa502; font-size: 2rem; margin-bottom: 10px;"></i>
+          <p style="color: rgba(255,255,255,0.7);">${t('verificationOnlyOwner', currentLang)}</p>
+        </div>
+      `;
+      requestBtn.style.display = 'none';
+    } else {
+      statusDiv.innerHTML = `
+        <div style="text-align: center; padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 10px;">
+          <i class="fas fa-clock" style="color: #ffa502; font-size: 2rem; margin-bottom: 10px;"></i>
+          <p style="color: rgba(255,255,255,0.7);">${t('verificationNotRequested', currentLang)}</p>
+        </div>
+      `;
+      requestBtn.style.display = 'block';
+      requestBtn.onclick = function() {
+        requestCommunityVerification(commId);
+      };
+    }
+    
+    verificationModal.classList.add('active');
+  };
+  
+  // Закрытие модального окна верификации
+  window.closeVerificationModal = function() {
+    verificationModal.classList.remove('active');
+  };
+  
+  // Загрузка постов сообщества из Firestore
+  async function loadCommunityPosts(commId) {
+    const user = auth.currentUser;
+    
+    try {
+      // Получаем информацию о сообществе из Firestore
+      const commDoc = await firestore.collection('communities').doc(commId).get();
+      const comm = commDoc.exists ? commDoc.data() : null;
+      
+      if (!comm) {
+        viewCommunityContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Сообщество не найдено</p>';
+        return;
+      }
+      
+      // Проверяем, является ли пользователь участником
+      let isMember = false;
+      let isOwner = false;
+      let memberRole = null;
+      
+      if (user) {
+        const memberDoc = await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).get();
+        if (memberDoc.exists) {
+          isMember = true;
+          const memberData = memberDoc.data();
+          memberRole = memberData.role;
+          if (memberData.role === 'owner') {
+            isOwner = true;
+          }
+        }
+      }
+      
+      // Получаем посты из Firestore
+      const postsSnapshot = await firestore.collection('community_posts')
+        .doc(commId)
+        .collection('posts')
+        .orderBy('createdAt', 'desc')
+        .limit(20)
+        .get();
+      
+      const posts = [];
+      postsSnapshot.forEach(doc => {
+        posts.push({ id: doc.id, ...doc.data() });
+      });
+      
+      // Устанавливаем фон
+      const viewCommunityBg = document.getElementById('view-community-bg');
+      if (comm.cover && comm.cover.startsWith('http')) {
+        viewCommunityBg.style.background = `url('${comm.cover}')`;
+      } else {
+        viewCommunityBg.style.background = comm.cover || 'linear-gradient(135deg, #1a1a2e, #16213e)';
+      }
+      
+      // Формируем HTML
+      const typeIcons = {
+        'public': '<i class="fas fa-globe"></i>',
+        'restricted': '<i class="fas fa-user-lock"></i>',
+        'private': '<i class="fas fa-lock"></i>'
+      };
+      
+      const typeLabels = {
+        'public': t('typePublic', currentLang),
+        'restricted': t('typeRestricted', currentLang),
+        'private': t('typePrivate', currentLang)
+      };
+      
+      let html = `
+        <div style="text-align: center; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 15px; margin-bottom: 20px;">
+          <img src="${comm.avatar || DEFAULT_COMMUNITY_AVATAR}" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; border: 3px solid rgba(255,255,255,0.3);">
+          <h2 style="color: white; margin: 10px 0;">
+            ${comm.name}
+            ${comm.verified ? '<i class="fas fa-check-circle" style="color: #2ed573; margin-left: 5px;" title="' + t('verified', currentLang) + '"></i>' : ''}
+          </h2>
+          <p style="color: rgba(255,255,255,0.7);">${comm.description || ''}</p>
+          <div style="display: flex; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap;">
+            <span style="color: rgba(255,255,255,0.8);"><i class="fas fa-users"></i> ${comm.membersCount || 0}</span>
+            <span style="color: rgba(255,255,255,0.8);"><i class="fas fa-file-alt"></i> ${comm.postsCount || 0} ${t('posts', currentLang)}</span>
+            <span style="color: rgba(255,255,255,0.8);">${typeIcons[comm.type] || ''} ${typeLabels[comm.type] || comm.type}</span>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+            ${isMember ? `
+              ${comm.type !== 'public' ? `<button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="openInviteModal('${commId}', '${comm.name.replace(/'/g, "\\'")}')"><i class="fas fa-link"></i> ${t('invite', currentLang)}</button>` : ''}
+              ${isOwner ? `<button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="openVerificationModal('${commId}', '${comm.name.replace(/'/g, "\\'")}', ${comm.verified || false}, true)"><i class="fas fa-check-circle"></i> ${t('verification', currentLang)}</button>` : ''}
+              <button class="auth-btn secondary" style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="openMembersModal('${commId}')"><i class="fas fa-users"></i> ${t('members', currentLang)}</button>
+              <button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #6e8efb, #a777e3);" onclick="openPostModal('${commId}')"><i class="fas fa-pen"></i> ${t('createPost', currentLang)}</button>
+            ` : `
+              <button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="joinCommunityFromView('${commId}')"><i class="fas fa-sign-in-alt"></i> ${t('joinCommunity', currentLang)}</button>
+            `}
+          </div>
+        </div>
+        
+        <h3 style="color: white; margin-bottom: 15px;"><i class="fas fa-newspaper"></i> ${t('posts', currentLang)}</h3>
+      `;
+      
+      // Посты
+      if (posts.length === 0) {
+        html += `<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">${t('noPosts', currentLang)}</p>`;
+      } else {
+        posts.forEach(post => {
+          let date = '';
+          if (post.createdAt && post.createdAt.toDate) {
+            date = post.createdAt.toDate().toLocaleDateString('ru-RU');
+          } else if (post.createdAt) {
+            date = new Date(post.createdAt).toLocaleDateString('ru-RU');
+          }
+          html += `
+            <div class="post-card" onclick="openViewPostModal('${post.id}', '${commId}')">
+              ${post.image ? `<img src="${post.image}" class="post-image" alt="Post image" onerror="this.style.display='none'">` : ''}
+              <div class="post-content">
+                <h4 class="post-title">${post.title || ''}</h4>
+                <p class="post-text">${post.content ? post.content.substring(0, 150) + (post.content.length > 150 ? '...' : '') : ''}</p>
+                <div class="post-meta">
+                  <span><i class="fas fa-user"></i> ${post.authorName || 'Unknown'}</span>
+                  <span><i class="fas fa-calendar"></i> ${date}</span>
+                  <span><i class="fas fa-comments"></i> ${post.commentsCount || 0}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      viewCommunityContent.innerHTML = html;
+      
+    } catch (error) {
+      console.error('Ошибка загрузки постов:', error);
+      viewCommunityContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Ошибка загрузки постов</p>';
+    }
+  }
+  
+  // Присоединение к сообществу из просмотра (Firestore)
+  window.joinCommunityFromView = async function(commId) {
+    const user = auth.currentUser;
+    if (!user) {
+      showToast(t('loginRequired', currentLang), 'warning');
+      return;
+    }
+    
+    try {
+      const commDoc = await firestore.collection('communities').doc(commId).get();
+      const comm = commDoc.data();
+      
+      if (!comm) return;
+      
+      if (comm.type === 'public') {
+        const now = firebase.firestore.FieldValue.serverTimestamp();
+        
+        // Добавляем в участники
+        await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).set({
+          role: 'member',
+          joinedAt: now,
+          nickname: headerNickname.textContent
+        });
+        
+        // Добавляем в список сообществ пользователя
+        await firestore.collection('user_communities').doc(user.uid).collection('communities').doc(commId).set({
+          role: 'member',
+          joinedAt: now
+        });
+        
+        // Увеличиваем счётчик участников
+        await firestore.collection('communities').doc(commId).update({
+          membersCount: firebase.firestore.FieldValue.increment(1)
+        });
+        
+        showToast(t('joinedCommunity', currentLang), 'success');
+        loadCommunityPosts(commId);
+      } else if (comm.type === 'restricted') {
+        const now = firebase.firestore.FieldValue.serverTimestamp();
+        await firestore.collection('community_requests').doc(commId).collection('requests').doc(user.uid).set({
+          nickname: headerNickname.textContent,
+          requestedAt: now,
+          status: 'pending'
+        });
+        
+        showToast(t('requestSent', currentLang), 'info');
+      } else {
+        showToast(t('communityPrivate', currentLang), 'warning');
+      }
+    } catch (error) {
+      console.error('Ошибка присоединения:', error);
+      showToast(t('error', currentLang), 'error');
+    }
+  };
+  
+  // Создание поста в Firestore
+  if (createPostForm) {
+    createPostForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const user = auth.currentUser;
+      if (!user) {
+        document.getElementById('post-error').textContent = t('loginRequired', currentLang);
+        return;
+      }
+      
+      if (!selectedCommunityForPost) {
+        document.getElementById('post-error').textContent = t('error', currentLang);
+        return;
+      }
+      
+      const title = document.getElementById('post-title').value.trim();
+      const content = document.getElementById('post-content').value.trim();
+      const image = document.getElementById('post-image').value.trim();
+      
+      if (!title || !content) {
+        document.getElementById('post-error').textContent = t('fillAllFields', currentLang);
+        return;
+      }
+      
+      try {
+        const now = firebase.firestore.FieldValue.serverTimestamp();
+        
+        // Создаём пост в Firestore
+        const postDocRef = await firestore.collection('community_posts').doc(selectedCommunityForPost).collection('posts').add({
+          title: title,
+          content: content,
+          image: image || null,
+          authorId: user.uid,
+          authorName: headerNickname.textContent,
+          createdAt: now,
+          likes: 0,
+          commentsCount: 0
+        });
+        
+        // Увеличиваем счётчик постов
+        await firestore.collection('communities').doc(selectedCommunityForPost).update({
+          postsCount: firebase.firestore.FieldValue.increment(1)
+        });
+        
+        closePostModal();
+        showToast(t('postCreated', currentLang), 'success');
+        loadCommunityPosts(selectedCommunityForPost);
+        
+      } catch (error) {
+        console.error('Ошибка создания поста:', error);
+        document.getElementById('post-error').textContent = t('postCreateError', currentLang);
+      }
+    });
+  }
+  
+  // Загрузка поста с комментариями из Firestore
+  async function loadPostWithComments(postId, commId) {
+    try {
+      // Получаем пост из Firestore
+      const postDoc = await firestore.collection('community_posts').doc(commId).collection('posts').doc(postId).get();
+      
+      if (!postDoc.exists) {
+        viewPostContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Пост не найден</p>';
+        return;
+      }
+      
+      const post = postDoc.data();
+      
+      let date = '';
+      if (post.createdAt && post.createdAt.toDate) {
+        date = post.createdAt.toDate().toLocaleString('ru-RU');
+      } else if (post.createdAt) {
+        date = new Date(post.createdAt).toLocaleString('ru-RU');
+      }
+      
+      let html = `
+        <div style="background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+          ${post.image ? `<img src="${post.image}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;" alt="Post image" onerror="this.style.display='none'">` : ''}
+          <h2 style="color: white; margin-bottom: 10px;">${post.title || ''}</h2>
+          <div style="color: rgba(255,255,255,0.7); margin-bottom: 15px;">
+            <span><i class="fas fa-user"></i> ${post.authorName || 'Unknown'}</span>
+            <span style="margin-left: 15px;"><i class="fas fa-calendar"></i> ${date}</span>
+          </div>
+          <p style="color: rgba(255,255,255,0.9); line-height: 1.6; white-space: pre-wrap;">${post.content || ''}</p>
+        </div>
+        
+        <h3 style="color: white; margin-bottom: 15px;"><i class="fas fa-comments"></i> ${t('comments', currentLang)} <span id="comments-count">(${post.commentsCount || 0})</span></h3>
+        
+        <!-- Форма добавления комментария -->
+        <div style="margin-bottom: 20px;">
+          <textarea id="comment-text" class="settings-textarea" placeholder="${t('writeComment', currentLang)}" maxlength="1000" style="width: 100%; min-height: 80px; margin-bottom: 10px;"></textarea>
+          <button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="addComment('${commId}', '${postId}')">
+            <i class="fas fa-paper-plane"></i> ${t('sendComment', currentLang)}
+          </button>
+        </div>
+        
+        <div id="comments-list">
+      `;
+      
+      // Загружаем комментарии из Firestore
+      const commentsSnapshot = await firestore.collection('post_comments')
+        .doc(commId)
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .orderBy('createdAt', 'desc')
+        .limit(50)
+        .get();
+      
+      const comments = [];
+      commentsSnapshot.forEach(doc => {
+        comments.push({ id: doc.id, ...doc.data() });
+      });
+      
+      if (comments.length === 0) {
+        html += `<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">${t('noComments', currentLang)}</p>`;
+      } else {
+        comments.forEach(comment => {
+          let commentDate = '';
+          if (comment.createdAt && comment.createdAt.toDate) {
+            commentDate = comment.createdAt.toDate().toLocaleString('ru-RU');
+          } else if (comment.createdAt) {
+            commentDate = new Date(comment.createdAt).toLocaleString('ru-RU');
+          }
+          html += `
+            <div class="comment-item" style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <img src="${comment.avatar || DEFAULT_AVATAR}" style="width: 35px; height: 35px; border-radius: 50%; margin-right: 10px;">
+                <div>
+                  <span style="color: white; font-weight: bold;">${comment.authorName || 'Unknown'}</span>
+                  <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-left: 10px;">${commentDate}</span>
+                </div>
+              </div>
+              <p style="color: rgba(255,255,255,0.9); margin: 0; line-height: 1.5;">${comment.text || ''}</p>
+            </div>
+          `;
+        });
+      }
+      
+      html += '</div>';
+      viewPostContent.innerHTML = html;
+      
+    } catch (error) {
+      console.error('Ошибка загрузки поста:', error);
+      viewPostContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Ошибка загрузки поста</p>';
+    }
+  }
+  
+  // Добавление комментария в Firestore
+  window.addComment = async function(commId, postId) {
+    const user = auth.currentUser;
+    if (!user) {
+      showToast(t('loginRequired', currentLang), 'warning');
+      return;
+    }
+    
+    const commentText = document.getElementById('comment-text').value.trim();
+    if (!commentText) {
+      showToast(t('enterComment', currentLang), 'warning');
+      return;
+    }
+    
+    try {
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+      
+      // Получаем аватар пользователя
+      const userSnapshot = await database.ref('users/' + user.uid).once('value');
+      const userData = userSnapshot.val();
+      
+      // Создаём комментарий в Firestore
+      await firestore.collection('post_comments').doc(commId).collection('posts').doc(postId).collection('comments').add({
+        text: commentText,
+        authorId: user.uid,
+        authorName: headerNickname.textContent,
+        avatar: userData?.avatar || DEFAULT_AVATAR,
+        createdAt: now
+      });
+      
+      // Увеличиваем счётчик комментариев в посте
+      const postRef = firestore.collection('community_posts').doc(commId).collection('posts').doc(postId);
+      await postRef.update({
+        commentsCount: firebase.firestore.FieldValue.increment(1)
+      });
+      
+      // Обновляем комментарии
+      loadPostWithComments(postId, commId);
+      
+    } catch (error) {
+      console.error('Ошибка добавления комментария:', error);
+      showToast(t('commentError', currentLang), 'error');
+    }
+  };
+  
+  // Загрузка участников сообщества из Firestore
+  async function loadCommunityMembers(commId) {
+    try {
+      const membersSnapshot = await firestore.collection('community_members').doc(commId).collection('members').get();
+      
+      if (membersSnapshot.empty) {
+        membersList.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center;">' + t('noMembers', currentLang) + '</p>';
+        return;
+      }
+      
+      const membersArray = membersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+      membersArray.sort((a, b) => {
+        const roleOrder = { 'owner': 0, 'admin': 1, 'moderator': 2, 'member': 3 };
+        return (roleOrder[a.role] || 4) - (roleOrder[b.role] || 4);
+      });
+      
+      let html = '';
+      membersArray.forEach(member => {
+        const roleIcons = {
+          'owner': '<i class="fas fa-crown" style="color: #ffa502;"></i>',
+          'admin': '<i class="fas fa-shield-alt" style="color: #2ed573;"></i>',
+          'moderator': '<i class="fas fa-star" style="color: #3742fa;"></i>',
+          'member': '<i class="fas fa-user" style="color: rgba(255,255,255,0.5);"></i>'
+        };
+        
+        const roleLabels = {
+          'owner': t('roleOwner', currentLang),
+          'admin': t('roleAdmin', currentLang),
+          'moderator': t('roleModerator', currentLang),
+          'member': t('roleMember', currentLang)
+        };
+        
+        const joinDate = member.joinedAt ? new Date(member.joinedAt).toLocaleDateString('ru-RU') : '';
+        
+        html += `
+          <div class="member-item" onclick="openUserProfile('${member.uid}')" style="display: flex; align-items: center; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: background 0.2s;">
+            <img src="${DEFAULT_AVATAR}" style="width: 45px; height: 45px; border-radius: 50%; margin-right: 12px;">
+            <div style="flex: 1;">
+              <div style="color: white; font-weight: bold;">
+                ${member.nickname || 'Unknown'}
+                ${roleIcons[member.role] || roleIcons.member}
+              </div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">
+                ${roleLabels[member.role] || t('roleMember', currentLang)} • ${t('joined', currentLang)} ${joinDate}
+              </div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: rgba(255,255,255,0.3);"></i>
+          </div>
+        `;
+      });
+      
+      membersList.innerHTML = html;
+      
+    } catch (error) {
+      console.error('Ошибка загрузки участников:', error);
+      membersList.innerHTML = '<p style="color: #ff4757; text-align: center;">Ошибка загрузки</p>';
+    }
+  }
+  
+  // Запрос верификации сообщества через Google Forms
+  async function requestCommunityVerification(commId) {
+    const user = auth.currentUser;
+    if (!user) {
+      showToast(t('loginRequired', currentLang), 'warning');
+      return;
+    }
+    
+    try {
+      // Открываем Google Forms в новой вкладке
+      window.open('https://docs.google.com/forms/d/e/1FAIpQLSdlGHpX6ocdh0rZ17VMuuOG-8DX9qmLXx4659LWNtdBW0YEdA/viewform', '_blank');
+      
+      // Также сохраняем запрос в БД
+      await database.ref('community_verifications/' + commId).set({
+        communityId: commId,
+        requestedBy: user.uid,
+        requestedAt: firebase.database.ServerValue.TIMESTAMP,
+        status: 'pending'
+      });
+      
+      showToast(t('verificationRequested', currentLang), 'success');
+      closeVerificationModal();
+      
+    } catch (error) {
+      console.error('Ошибка запроса верификации:', error);
+      showToast(t('error', currentLang), 'error');
+    }
+  }
+  
+  // Обработчик копирования ссылки приглашения
+  const copyInviteLinkBtn = document.getElementById('copy-invite-link');
+  if (copyInviteLinkBtn) {
+    copyInviteLinkBtn.addEventListener('click', () => {
+      const inviteLink = document.getElementById('invite-link');
+      navigator.clipboard.writeText(inviteLink.value).then(() => {
+        document.getElementById('invite-link-copied').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('invite-link-copied').style.display = 'none';
+        }, 2000);
+      });
+    });
+  }
+  
+  // Закрытие модальных окон по клику вне
+  viewCommunityModal.addEventListener('click', (e) => {
+    if (e.target === viewCommunityModal) {
+      closeViewCommunityModal();
+    }
+  });
+  
+  postModal.addEventListener('click', (e) => {
+    if (e.target === postModal) {
+      closePostModal();
+    }
+  });
+  
+  viewPostModal.addEventListener('click', (e) => {
+    if (e.target === viewPostModal) {
+      closeViewPostModal();
+    }
+  });
+  
+  membersModal.addEventListener('click', (e) => {
+    if (e.target === membersModal) {
+      closeMembersModal();
+    }
+  });
+  
+  inviteModal.addEventListener('click', (e) => {
+    if (e.target === inviteModal) {
+      closeInviteModal();
+    }
+  });
+  
+  verificationModal.addEventListener('click', (e) => {
+    if (e.target === verificationModal) {
+      closeVerificationModal();
+    }
+  });
+  
+  
+  // Обработка ссылки приглашения при загрузке страницы
+  function handleInviteLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const joinCode = urlParams.get('join');
+    
+    if (joinCode) {
+      // Удаляем параметр из URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Проверяем, авторизован ли пользователь
+      const user = auth.currentUser;
+      if (user) {
+        viewCommunity(joinCode);
+      } else {
+        // Показываем уведомление после входа
+        sessionStorage.setItem('pendingJoin', joinCode);
+      }
+    }
+  }
+  
+  // Обработка ожидающего приглашения после входа
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      const pendingJoin = sessionStorage.getItem('pendingJoin');
+      if (pendingJoin) {
+        sessionStorage.removeItem('pendingJoin');
+        setTimeout(() => {
+          viewCommunity(pendingJoin);
+        }, 1000);
+      }
+    }
+  });
+  
+  // Вызываем обработку при загрузке
+  handleInviteLink();
 
   // Часы
   function updateClock() {
@@ -792,4 +2165,84 @@
       container.style.animation = 'fadeInScale 0.5s ease-out';
     });
   });
+  
+  // Экспорт переменных в глобальную область для использования внешними функциями
+  window.firebaseAuth = auth;
+  window.firebaseDatabase = database;
+  window.firebaseFirestore = firestore;
+  window.firebase = firebase;
+  window.isAdminGlobal = isAdmin;
+  window.showToastGlobal = showToast;
+  window.closeModalGlobal = closeModal;
+  window.tGlobal = t;
+  window.currentLangGlobal = currentLang;
+  window.headerNicknameGlobal = headerNickname;
 })();
+
+// Глобальные функции для админа
+window.banUser = async function(uid, reason) {
+  const auth = window.firebaseAuth;
+  const database = window.firebaseDatabase;
+  const firebase = window.firebase;
+  const user = auth?.currentUser;
+  const isAdmin = window.isAdminGlobal;
+  const showToast = window.showToastGlobal;
+  const closeModal = window.closeModalGlobal;
+  const t = window.tGlobal;
+  const currentLang = window.currentLangGlobal;
+  
+  if (!user || !isAdmin?.(user)) return;
+  
+  try {
+    await database.ref('users/' + uid).update({
+      banned: true,
+      banReason: reason,
+      bannedAt: firebase.database.ServerValue.TIMESTAMP,
+      bannedBy: user.uid
+    });
+    
+    showToast(t('userBanned', currentLang), 'success');
+    closeModal();
+  } catch (error) {
+    console.error('Ошибка бана:', error);
+    showToast(t('banError', currentLang), 'error');
+  }
+};
+
+window.unbanUser = async function(uid) {
+  const auth = window.firebaseAuth;
+  const database = window.firebaseDatabase;
+  const firebase = window.firebase;
+  const user = auth?.currentUser;
+  const isAdmin = window.isAdminGlobal;
+  const showToast = window.showToastGlobal;
+  const closeModal = window.closeModalGlobal;
+  const t = window.tGlobal;
+  const currentLang = window.currentLangGlobal;
+  
+  if (!user || !isAdmin?.(user)) return;
+  
+  try {
+    await database.ref('users/' + uid).update({
+      banned: null,
+      banReason: null,
+      bannedAt: null,
+      bannedBy: null
+    });
+    
+    showToast(t('userUnbanned', currentLang), 'success');
+    closeModal();
+  } catch (error) {
+    console.error('Ошибка разбана:', error);
+    showToast(t('unbanError', currentLang), 'error');
+  }
+};
+
+window.showBanDialog = function(uid, nickname) {
+  const t = window.tGlobal;
+  const currentLang = window.currentLangGlobal;
+  const reason = prompt(t('enterBanReason', currentLang));
+  if (reason !== null && reason.trim() !== '') {
+    window.banUser(uid, reason.trim());
+  }
+};
