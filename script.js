@@ -1587,25 +1587,30 @@
     verificationModal.classList.remove('active');
   };
   
-  // Загрузка постов сообщества из Firestore
+// Загрузка постов сообщества из Firestore
   async function loadCommunityPosts(commId) {
     const user = auth.currentUser;
-    
+
+    if (!user) {
+      viewCommunityContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Пожалуйста, войдите в систему для просмотра постов</p>';
+      return;
+    }
+
     try {
       // Получаем информацию о сообществе из Firestore
       const commDoc = await firestore.collection('communities').doc(commId).get();
       const comm = commDoc.exists ? commDoc.data() : null;
-      
+
       if (!comm) {
         viewCommunityContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Сообщество не найдено</p>';
         return;
       }
-      
+
       // Проверяем, является ли пользователь участником
       let isMember = false;
       let isOwner = false;
       let memberRole = null;
-      
+
       if (user) {
         const memberDoc = await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).get();
         if (memberDoc.exists) {
@@ -1617,7 +1622,7 @@
           }
         }
       }
-      
+
       // Получаем посты из Firestore
       const postsSnapshot = await firestore.collection('community_posts')
         .doc(commId)
@@ -1625,12 +1630,12 @@
         .orderBy('createdAt', 'desc')
         .limit(20)
         .get();
-      
+
       const posts = [];
       postsSnapshot.forEach(doc => {
         posts.push({ id: doc.id, ...doc.data() });
       });
-      
+
       // Устанавливаем фон
       const viewCommunityBg = document.getElementById('view-community-bg');
       if (comm.cover && comm.cover.startsWith('http')) {
@@ -1638,20 +1643,20 @@
       } else {
         viewCommunityBg.style.background = comm.cover || 'linear-gradient(135deg, #1a1a2e, #16213e)';
       }
-      
+
       // Формируем HTML
       const typeIcons = {
         'public': '<i class="fas fa-globe"></i>',
         'restricted': '<i class="fas fa-user-lock"></i>',
         'private': '<i class="fas fa-lock"></i>'
       };
-      
+
       const typeLabels = {
         'public': t('typePublic', currentLang),
         'restricted': t('typeRestricted', currentLang),
         'private': t('typePrivate', currentLang)
       };
-      
+
       let html = `
         <div style="text-align: center; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 15px; margin-bottom: 20px;">
           <img src="${comm.avatar || DEFAULT_COMMUNITY_AVATAR}" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; border: 3px solid rgba(255,255,255,0.3);">
@@ -1670,6 +1675,7 @@
               ${comm.type !== 'public' ? `<button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="openInviteModal('${commId}', '${comm.name.replace(/'/g, "\\'")}')"><i class="fas fa-link"></i> ${t('invite', currentLang)}</button>` : ''}
               ${isOwner ? `<button class="auth-btn" style="width: auto; padding: 10px 20px;" onclick="openVerificationModal('${commId}', '${comm.name.replace(/'/g, "\\'")}', ${comm.verified || false}, true)"><i class="fas fa-check-circle"></i> ${t('verification', currentLang)}</button>` : ''}
               <button class="auth-btn secondary" style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="openMembersModal('${commId}')"><i class="fas fa-users"></i> ${t('members', currentLang)}</button>
+              ${isOwner ? `<button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #00b894, #00cec9);" onclick="openEditCommunityModal('${commId}')"><i class="fas fa-edit"></i> Редактировать</button>` : ''}
               ${isOwner ? `<button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #ff4757, #ff6b81);" onclick="deleteCommunity('${commId}', '${comm.name.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i> ${t('deleteCommunity', currentLang)}</button>` : `
               <button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #ffa502, #ff7f50);" onclick="leaveCommunity('${commId}')"><i class="fas fa-sign-out-alt"></i> ${t('leaveCommunity', currentLang)}</button>`}
               <button class="auth-btn" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #6e8efb, #a777e3);" onclick="openPostModal('${commId}')"><i class="fas fa-pen"></i> ${t('createPost', currentLang)}</button>
@@ -1678,10 +1684,10 @@
             `}
           </div>
         </div>
-        
+
         <h3 style="color: white; margin-bottom: 15px;"><i class="fas fa-newspaper"></i> ${t('posts', currentLang)}</h3>
       `;
-      
+
       // Посты
       if (posts.length === 0) {
         html += `<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">${t('noPosts', currentLang)}</p>`;
@@ -1709,12 +1715,12 @@
           `;
         });
       }
-      
+
       viewCommunityContent.innerHTML = html;
-      
+
     } catch (error) {
       console.error('Ошибка загрузки постов:', error);
-      viewCommunityContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Ошибка загрузки постов</p>';
+      viewCommunityContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Ошибка загрузки постов. Пожалуйста, обновите страницу или проверьте подключение к интернету.</p>';
     }
   }
   
@@ -1832,15 +1838,42 @@
   // Загрузка поста с комментариями из Firestore
   async function loadPostWithComments(postId, commId) {
     try {
+      // Получаем текущего пользователя
+      const user = window.firebaseAuth?.currentUser;
+
+      // Проверяем, является ли пользователь участником сообщества
+      let isMember = false;
+      if (user) {
+        const memberDoc = await firestore.collection('community_members').doc(commId).collection('members').doc(user.uid).get();
+        isMember = memberDoc.exists;
+      }
+
       // Получаем пост из Firestore
       const postDoc = await firestore.collection('community_posts').doc(commId).collection('posts').doc(postId).get();
-      
+
+      // Проверяем, что пост существует и имеет данные
       if (!postDoc.exists) {
         viewPostContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Пост не найден</p>';
         return;
       }
-      
+
       const post = postDoc.data();
+      if (!post) {
+        viewPostContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Пост повреждён</p>';
+        return;
+      }
+
+      // Проверяем минимальную структуру поста
+      if (!post.title && !post.content) {
+        viewPostContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Пост пустой или повреждён</p>';
+        return;
+      }
+
+      // Проверяем, что есть хотя бы один из обязательных полей
+      if (!post.title && !post.content) {
+        viewPostContent.innerHTML = '<p style="color: #ff4757; text-align: center;">Пост не имеет содержимого</p>';
+        return;
+      }
       
       let date = '';
       if (post.createdAt && post.createdAt.toDate) {
@@ -2226,8 +2259,8 @@
         loadCommunityPosts(commId);
         openViewCommunityModal(commId);
       } else {
-        // Закрытое сообщество - показываем уведомление, но открываем модалку
-        showToast(t('communityPrivate', currentLang), 'warning');
+        // Закрытое сообщество — показываем просмотр и кнопку "Запросить доступ"
+        loadCommunityPosts(commId);
         openViewCommunityModal(commId);
       }
     } catch (error) {
@@ -2298,7 +2331,116 @@
   window.loadCommunityPostsGlobal = loadCommunityPosts;
 })();
 
+/**
+ * Модальное окно редактирования сообщества
+ */
+window.openEditCommunityModal = async function(commId) {
+  const auth = window.firebaseAuth;
+  const firestore = window.firebaseFirestore;
+  const showToast = window.showToastGlobal;
+  const t = window.tGlobal;
+  const currentLang = window.currentLangGlobal;
+
+  const user = auth?.currentUser;
+  if (!user) return;
+
+  // Получаем данные сообщества
+  const commDoc = await firestore.collection('communities').doc(commId).get();
+  const comm = commDoc.data();
+  if (!comm) {
+    showToast('Сообщество не найдено', 'error');
+    return;
+  }
+  if (comm.ownerId !== user.uid) {
+    showToast('Только владелец может редактировать', 'error');
+    return;
+  }
+
+  // Создаем простое модальное окно (можно доработать стилизацию)
+  let modal = document.getElementById('edit-community-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'edit-community-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.7)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '9999';
+    modal.innerHTML = `
+      <div style="background: #222; padding: 30px 25px; border-radius: 16px; min-width: 320px; max-width: 95vw; box-shadow: 0 8px 32px rgba(0,0,0,0.3); position: relative;">
+        <button id="close-edit-community-modal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button>
+        <h2 style="color: #fff; margin-bottom: 20px;">Редактировать сообщество</h2>
+        <form id="edit-community-form">
+          <div style="margin-bottom: 15px;">
+            <label style="color: #fff;">Название</label>
+            <input type="text" id="edit-community-name" value="${comm.name}" maxlength="50" style="width: 100%; padding: 8px; border-radius: 6px; border: none; margin-top: 5px;">
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="color: #fff;">Аватар (URL)</label>
+            <input type="text" id="edit-community-avatar" value="${comm.avatar || ''}" style="width: 100%; padding: 8px; border-radius: 6px; border: none; margin-top: 5px;">
+          </div>
+          <div id="edit-community-error" style="color: #ff4757; margin-bottom: 10px;"></div>
+          <button type="submit" style="background: linear-gradient(135deg, #00b894, #00cec9); color: #fff; border: none; border-radius: 6px; padding: 10px 25px; font-size: 1rem; cursor: pointer;">Сохранить</button>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  } else {
+    modal.style.display = 'flex';
+    document.getElementById('edit-community-name').value = comm.name;
+    document.getElementById('edit-community-avatar').value = comm.avatar || '';
+    document.getElementById('edit-community-error').textContent = '';
+  }
+
+  // Закрытие модалки
+  document.getElementById('close-edit-community-modal').onclick = () => {
+    modal.style.display = 'none';
+  };
+
+  // Сохранение изменений
+  document.getElementById('edit-community-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('edit-community-name').value.trim();
+    const avatar = document.getElementById('edit-community-avatar').value.trim();
+    const errorDiv = document.getElementById('edit-community-error');
+    errorDiv.textContent = '';
+
+    if (!name) {
+      errorDiv.textContent = 'Название обязательно';
+      return;
+    }
+    if (name.length > 50) {
+      errorDiv.textContent = 'Название слишком длинное';
+      return;
+    }
+
+    try {
+      await firestore.collection('communities').doc(commId).update({
+        name: name,
+        avatar: avatar
+      });
+      showToast('Сообщество обновлено', 'success');
+      modal.style.display = 'none';
+      if (typeof window.loadCommunityPostsGlobal === 'function') {
+        window.loadCommunityPostsGlobal(commId);
+      }
+      if (typeof window.loadCommunitiesGlobal === 'function') {
+        window.loadCommunitiesGlobal();
+      }
+    } catch (err) {
+      errorDiv.textContent = 'Ошибка сохранения';
+    }
+  };
+};
+
+/*
 // Глобальные функции для админа
+*/
 window.banUser = async function(uid, reason) {
   const auth = window.firebaseAuth;
   const database = window.firebaseDatabase;
