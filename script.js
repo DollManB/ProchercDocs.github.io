@@ -1,15 +1,15 @@
 (function() {
   // Firebase configuration
   const firebaseConfig = {
-    apiKey: "AIzaSyB8lNIi3oxy0ChMy2AK2U2C5S8oy-P7bhY",
-    authDomain: "procherdocs.firebaseapp.com",
-    databaseURL: "https://procherdocs-default-rtdb.firebaseio.com",
-    projectId: "procherdocs",
-    storageBucket: "procherdocs.firebasestorage.app",
-    messagingSenderId: "679242787524",
-    appId: "1:679242787524:web:2f6b9e3e9254ef7f667791",
-    measurementId: "G-4TM0T7C0C7"
-  };
+  apiKey: "AIzaSyB8lNIi3oxy0ChMy2AK2U2C5S8oy-P7bhY",
+  authDomain: "procherdocs.firebaseapp.com",
+  databaseURL: "https://procherdocs-default-rtdb.firebaseio.com",
+  projectId: "procherdocs",
+  storageBucket: "procherdocs.firebasestorage.app",
+  messagingSenderId: "679242787524",
+  appId: "1:679242787524:web:2903505183f73ad1667791",
+  measurementId: "G-L3CT3D4CZ2"
+};
 
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
