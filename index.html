@@ -3,908 +3,651 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ProchercEngine docs</title>
-  <!-- Font Awesome для иконок -->
+  <title>ProchercEngine — Docs</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
-  <!-- Firebase SDK (Compat version) -->
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-storage-compat.js"></script>
-  
-  <!-- Подключение CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Анимированные фоновые частицы -->
-  <div class="background">
-    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-  </div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 
-  <!-- Экран аутентификации -->
-  <div id="auth-screen" class="auth-container" style="display: flex;">
+  <!-- AUTH -->
+  <div id="auth-screen" class="auth-container" style="display:flex;">
     <div class="auth-card">
       <div class="auth-header">
-        <h1><i class="fas fa-shield-alt"></i> <span data-i18n="authTitle">DocsProcherc</span></h1>
+        <h1><i class="fas fa-cube"></i> ProchercEngine</h1>
         <p data-i18n="authWelcome">Добро пожаловать! Пожалуйста, войдите или зарегистрируйтесь</p>
       </div>
-      
       <div class="auth-tabs">
         <button class="auth-tab active" data-tab="login" data-i18n="authLogin">Вход</button>
         <button class="auth-tab" data-tab="register" data-i18n="authRegister">Регистрация</button>
       </div>
-
       <div class="auth-form-container">
-        <!-- Форма входа -->
         <form id="login-form" class="auth-form active">
-          <div class="form-group">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="login-email" data-i18n-placeholder="authEmail" placeholder="Email" required>
-          </div>
-          <div class="form-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="login-password" data-i18n-placeholder="authPassword" placeholder="Пароль" required>
-          </div>
+          <div class="form-group"><i class="fas fa-envelope"></i><input type="email" id="login-email" placeholder="Email" required></div>
+          <div class="form-group"><i class="fas fa-lock"></i><input type="password" id="login-password" placeholder="Пароль" required></div>
           <div id="login-error" class="auth-error"></div>
-          <button type="submit" class="auth-btn" data-i18n="authSignIn">
-            <i class="fas fa-sign-in-alt"></i> Войти
-          </button>
+          <button type="submit" class="auth-btn"><i class="fas fa-sign-in-alt"></i> <span data-i18n="authSignIn">Войти</span></button>
         </form>
-
-        <!-- Форма регистрации -->
         <form id="register-form" class="auth-form">
-          <div class="form-group">
-            <i class="fas fa-user"></i>
-            <input type="text" id="register-name" data-i18n-placeholder="authName" placeholder="Имя" required maxlength="15">
-            <span class="input-hint" id="name-hint">0/15</span>
-          </div>
-          <div class="form-group">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="register-email" data-i18n-placeholder="authEmail" placeholder="Email" required>
-          </div>
-          <div class="form-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="register-password" data-i18n-placeholder="authPassword" placeholder="Пароль" required>
-          </div>
-          <div class="form-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="register-confirm" data-i18n-placeholder="authConfirmPassword" placeholder="Подтвердите пароль" required>
-          </div>
+          <div class="form-group"><i class="fas fa-user"></i><input type="text" id="register-name" placeholder="Имя" required maxlength="15"><span class="input-hint" id="name-hint">0/15</span></div>
+          <div class="form-group"><i class="fas fa-envelope"></i><input type="email" id="register-email" placeholder="Email" required></div>
+          <div class="form-group"><i class="fas fa-lock"></i><input type="password" id="register-password" placeholder="Пароль" required></div>
+          <div class="form-group"><i class="fas fa-lock"></i><input type="password" id="register-confirm" placeholder="Подтвердите пароль" required></div>
           <div id="register-error" class="auth-error"></div>
-          <button type="submit" class="auth-btn" data-i18n="authSignUp">
-            <i class="fas fa-user-plus"></i> Зарегистрироваться
-          </button>
+          <button type="submit" class="auth-btn"><i class="fas fa-user-plus"></i> <span data-i18n="authSignUp">Зарегистрироваться</span></button>
         </form>
-
-        <!-- Форма подтверждения email -->
         <form id="verify-form" class="auth-form">
-          <div class="verify-info">
-            <i class="fas fa-envelope-open-text"></i>
-            <p data-i18n="verifyInfo">На ваш email был отправлен код подтверждения. Пожалуйста, введите его ниже.</p>
-          </div>
-          <div class="form-group">
-            <i class="fas fa-key"></i>
-            <input type="text" id="verify-code" data-i18n-placeholder="verifyCode" placeholder="Код подтверждения" required maxlength="6">
-          </div>
+          <div class="verify-info"><i class="fas fa-envelope-open-text"></i><p data-i18n="verifyInfo">На ваш email был отправлен код подтверждения.</p></div>
+          <div class="form-group"><i class="fas fa-key"></i><input type="text" id="verify-code" placeholder="Код подтверждения" required maxlength="6"></div>
           <div id="verify-error" class="auth-error"></div>
-          <button type="submit" class="auth-btn" data-i18n="verifySubmit">
-            <i class="fas fa-check"></i> Подтвердить
-          </button>
-          <button type="button" id="resend-code" class="auth-btn secondary" data-i18n="verifyResend">
-            <i class="fas fa-redo"></i> Отправить код повторно
-          </button>
-          <button type="button" id="cancel-verify" class="auth-btn cancel" data-i18n="verifyCancel">
-            <i class="fas fa-times"></i> Отмена
-          </button>
+          <button type="submit" class="auth-btn"><i class="fas fa-check"></i> <span data-i18n="verifySubmit">Подтвердить</span></button>
+          <button type="button" id="resend-code" class="auth-btn secondary" style="margin-top:8px;"><i class="fas fa-redo"></i> <span data-i18n="verifyResend">Отправить повторно</span></button>
+          <button type="button" id="cancel-verify" class="auth-btn cancel" style="margin-top:8px;"><i class="fas fa-times"></i> <span data-i18n="verifyCancel">Отмена</span></button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Основной контент -->
-  <div id="main-content" class="glass-container" style="display: none;">
-    <!-- Верхняя панель с профилем и языком -->
+  <!-- MAIN -->
+  <div id="main-content" class="glass-container" style="display:none;">
     <div class="top-bar">
       <div class="left-section">
-        <!-- Профиль в шапке (открывает профиль) -->
         <div id="header-profile" class="header-profile" onclick="switchTab('profile')">
           <img id="header-avatar" class="header-avatar" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s" alt="Avatar">
           <div class="header-info">
             <div class="header-name">
-              <span id="header-nickname" data-i18n="">Загрузка...</span>
-              <img id="header-premium-badge" class="premium-badge" src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" style="display: none;">
+              <span id="header-nickname">Загрузка...</span>
+              <img id="header-premium-badge" class="premium-badge" src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" style="display:none;">
             </div>
             <span id="header-email" class="header-email">Загрузка...</span>
           </div>
         </div>
-        
-        <!-- Кнопка настроек (открывает настройки) -->
-        <button id="settings-btn" class="settings-btn" onclick="switchTab('settings')" title="Settings">
-          <i class="fas fa-cog"></i>
-        </button>
+        <button class="icon-btn settings-btn" onclick="switchTab('settings')" title="Настройки"><i class="fas fa-cog"></i></button>
+        <button class="icon-btn community-btn" onclick="switchTab('communities')" title="Сообщества"><i class="fas fa-users"></i></button>
       </div>
-
       <div class="right-section">
-        <!-- Переключатель языка -->
         <div class="lang-switcher">
-          <button class="lang-btn active" id="lang-ru" data-lang="ru"><i class="fas fa-language"></i> <span data-i18n="ru">RU</span></button>
-          <button class="lang-btn" id="lang-en" data-lang="en"><i class="fas fa-language"></i> <span data-i18n="en">EN</span></button>
+          <button class="lang-btn active" id="lang-ru" data-lang="ru">RU</button>
+          <button class="lang-btn" id="lang-en" data-lang="en">EN</button>
         </div>
-        <!-- Кнопка выхода -->
-        <button id="logout-btn" class="logout-btn" data-i18n="logout">
-          <i class="fas fa-sign-out-alt"></i> Выйти
-        </button>
+        <button id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Выйти</span></button>
       </div>
     </div>
 
-    <!-- Вкладки (только основные) -->
     <div class="tabs">
       <button class="tab active" data-tab="player"><i class="fas fa-user"></i> <span class="tab-text" data-i18n="tabPlayer">Игрок</span></button>
-      <button class="tab" data-tab="hitbox"><i class="fas fa-vector-square"></i> <span class="tab-text" data-i18n="tabHitbox">Хитбокс</span></button>
       <button class="tab" data-tab="server"><i class="fas fa-server"></i> <span class="tab-text" data-i18n="tabServer">Сервер</span></button>
+      <button class="tab" data-tab="hitbox"><i class="fas fa-vector-square"></i> <span class="tab-text" data-i18n="tabHitbox">Хитбокс</span></button>
+      <button class="tab" data-tab="event"><i class="fas fa-bolt"></i> <span class="tab-text">Event</span></button>
+      <button class="tab" data-tab="world"><i class="fas fa-globe"></i> <span class="tab-text">World</span></button>
+      <button class="tab" data-tab="entity"><i class="fas fa-dragon"></i> <span class="tab-text">Entity</span></button>
+      <button class="tab" data-tab="item"><i class="fas fa-box-open"></i> <span class="tab-text">Item</span></button>
+      <button class="tab" data-tab="particle"><i class="fas fa-star"></i> <span class="tab-text">Particle</span></button>
       <button class="tab" data-tab="time"><i class="fas fa-clock"></i> <span class="tab-text" data-i18n="tabTime">Время</span></button>
-      <button class="tab" data-tab="communities"><i class="fas fa-users"></i> <span class="tab-text" data-i18n="tabCommunities">Сообщества</span></button>
     </div>
 
-    <!-- Контейнер контента вкладок -->
     <div class="content-container">
-      <!-- Вкладка Игрок (документация Player API) -->
-      <div id="player" class="tab-content">
+
+      <!-- PLAYER -->
+      <div id="player" class="tab-content active">
         <div class="api-header">
-          <div class="api-title" data-i18n="playerApiTitle">Player API</div>
-          <div class="api-description" data-i18n="playerApiDescription">
-            Player API предоставляет полный набор инструментов для работы с игроками в игре. 
-            Этот API позволяет управлять всеми аспектами игрока: от базовой информации до сложных взаимодействий.
-          </div>
+          <div class="api-title">Player API</div>
+          <div class="api-description">Инструменты для взаимодействия с игроком: сообщения, телепорт, позиция, ввод данных и многое другое. Объект <code style="color:#8b5cf6;font-family:monospace">Player</code> доступен в скриптах запущенных от имени игрока, либо получен через <code style="color:#8b5cf6;font-family:monospace">Server</code>.</div>
         </div>
-
         <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-check-circle"></i>
-            <span data-i18n="playerApiBestPractices">Лучшие практики</span>
-          </div>
-          <div class="api-best-practices">
-            <h4><i class="fas fa-check"></i> <span data-i18n="playerApiCheckNull">Обработка ошибок</span></h4>
-            <p data-i18n="playerApiCheckNull">Проверяйте возвращаемые значения на null/undefined</p>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span data-i18n="playerApiLimitations">Ограничения</span>
-          </div>
-          <div class="api-limitations">
-            <ul style="margin-left: 20px; color: rgba(255,255,255,0.9);">
-              <li data-i18n="playerApiNotWorkingEntities">Некоторые методы могут не работать с не-игровыми сущностями</li>
-              <li data-i18n="playerApiInventoryConflicts">Модификации инвентаря могут конфликтовать с другими модами</li>
-              <li data-i18n="playerApiPhysicsSync">Физические изменения могут не синхронизироваться в реальном времени в мультиплеере</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-code"></i>
-            <span data-i18n="playerApiMethods">Методы API</span>
-          </div>
-
+          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
           <div class="api-method">
-            <div class="api-method-name" data-i18n="playerApiGetName">getName()</div>
-            <div class="api-method-description" data-i18n="playerApiGetNameDesc">Получить имя игрока</div>
-            <div class="api-code-block">
-              let name = Player.getName();<br>
-              <span class="comment">// пример использования</span><br>
-              let name = Player.getName();<br>
-              Player.sendMessage(name);
-            </div>
+            <div class="api-method-name">getName() → String</div>
+            <div class="api-method-description">Получить никнейм игрока.</div>
+            <div class="api-code-block"><span class="keyword">var</span> name = Player.getName();<br>Player.sendMessage(<span class="string">"Привет, "</span> + name + <span class="string">"!"</span>);</div>
           </div>
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="playerApiSendMessage">sendMessage(text)</div>
-            <div class="api-method-description" data-i18n="playerApiSendMessageDesc">Игрок может разговаривать, выводить <span class="api-highlight">сообщение</span> в чат</div>
-            <div class="api-code-block">
-              Player.sendMessage(<span class="string">"text{STRING}"</span>);<br><br>
-              <span class="comment">// с переменной:</span><br>
-              const text = <span class="string">"hi"</span>;<br>
-              Player.sendMessage(text);
-            </div>
+            <div class="api-method-name">sendMessage(text)</div>
+            <div class="api-method-description">Отправить игроку сообщение в чат. Поддерживает §-коды цвета.</div>
+            <div class="api-code-block">Player.sendMessage(<span class="string">"§aЗелёный текст"</span>);<br>Player.sendMessage(<span class="string">"§cКрасный текст"</span>);</div>
           </div>
-          
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="playerApiGetServerPlayer">getServerPlayer()</div>
-            <div class="api-method-description" data-i18n="playerApiGetServerPlayerDesc">Получить ServerPlayerEntity - компонент игрока зависящий от net.minecraft.server.network</div>
-            <div class="serverplayer-info">
-              <p><span data-i18n="playerApiServerPlayerLink">Полную информацию можно посмотреть</span> <a href="https://maven.fabricmc.net/docs/yarn-1.20.1+build.1/net/minecraft/server/network/ServerPlayerEntity.html" target="_blank" class="api-link">тут</a></p>
-            </div>
-            <div class="api-code-block">
-              let player = Player.getServerPlayer(); <span class="comment">// возвращает ServerPlayerEntity в player</span>
-            </div>
+            <div class="api-method-name">teleport(x, y, z)</div>
+            <div class="api-method-description">Телепортировать игрока на координаты.</div>
+            <div class="api-code-block">Player.teleport(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>);</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">getPos() → {x, y, z}</div>
+            <div class="api-method-description">Получить текущую позицию игрока.</div>
+            <div class="api-code-block"><span class="keyword">var</span> pos = Player.getPos();<br>Player.sendMessage(<span class="string">"X: "</span> + pos.x + <span class="string">" Y: "</span> + pos.y);</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">input(prompt, callback)</div>
+            <div class="api-method-description">Запросить у игрока ввод текста через чат. Callback вызывается с введённой строкой.</div>
+            <div class="api-code-block">Player.input(<span class="string">"Введите ваше имя:"</span>, <span class="keyword">function</span>(answer) {<br>&nbsp;&nbsp;Player.sendMessage(<span class="string">"Вы ввели: "</span> + answer);<br>});</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">getServerPlayer() → ServerPlayerEntity</div>
+            <div class="api-method-description">Получить нативный объект <a href="https://maven.fabricmc.net/docs/yarn-1.20.1+build.1/net/minecraft/server/network/ServerPlayerEntity.html" target="_blank" class="api-link">ServerPlayerEntity</a> для низкоуровневых операций.</div>
+            <div class="api-code-block"><span class="keyword">var</span> sp = Player.getServerPlayer();</div>
           </div>
         </div>
-      </div>
-
-      <!-- Вкладка Хитбокс -->
-      <div id="hitbox" class="tab-content">
-        <div class="api-header">
-          <div class="api-title" data-i18n="hitboxApiTitle">📦 HitboxAPI</div>
-          <div class="api-description" data-i18n="hitboxApiDescription">
-            API который поможет вам в разработке своим хитбоксом, он выполняет две функции: <strong>InteractTrigger</strong> и <strong>enteredTrigger</strong>
-          </div>
-        </div>
-          
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-hand-pointer"></i>
-            <span data-i18n="hitboxInteractTrigger">interactTrigger</span>
-          </div>
-          <p data-i18n="hitboxInteractTriggerDesc">Работает по нажатию ПКМ по хитбоксу</p>
-          <div class="api-code-block">
-            <span class="comment">// Пример использования interactTrigger</span><br>
-            <span class="keyword">var</span> myHitbox = Hitbox.create(100, 64, 100, 2.0, 3.0);<br>
-            <span class="keyword">myHitbox.onInteract</span>(myHitbox.getEntity(), <span class="keyword">function</span>(Player) {<br>
-            &nbsp;&nbsp;<span class="comment">// действие</span><br>
-            });
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-sign-in-alt"></i>
-            <span data-i18n="hitboxEnteredTrigger">enteredTrigger</span>
-          </div>
-          <p data-i18n="hitboxEnteredTriggerDesc">Работает когда игрок зашел в триггер</p>
-          <div class="api-code-block">
-            <span class="comment">// Пример использования enteredTrigger</span><br>
-            <span class="keyword">var</span> myHitbox = Hitbox.create(100, 64, 100, 2.0, 3.0);<br>
-            <span class="keyword">myHitbox.onEnter</span>(myHitbox.getEntity(), <span class="keyword">function</span>(Player) {<br>
-            &nbsp;&nbsp;<span class="comment">// действие</span><br>
-            });
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-trash-alt"></i>
-            <span data-i18n="hitboxRemove">Удаление хитбокса</span>
-          </div>
-          <p data-i18n="hitboxRemoveDesc">А так же можно убирать его</p>
-          <div class="api-code-block">
-            <span class="comment">// Пример удаления хитбокса</span><br>
-            <span class="keyword">var</span> myHitbox = Hitbox.create(100, 64, 100, 2.0, 3.0);<br>
-            <span class="keyword">myHitbox.remove</span>();
-          </div>
-        </div>
-
         <div class="api-best-practices">
-          <h4><i class="fas fa-lightbulb"></i> <span data-i18n="hitboxRecommendations">Рекомендации по использованию</span></h4>
+          <h4><i class="fas fa-lightbulb"></i> Советы</h4>
           <ul>
-            <li data-i18n="hitboxInteractForObjects">Используйте <strong>interactTrigger</strong> для интерактивных объектов (двери, кнопки, сундуки)</li>
-            <li data-i18n="hitboxEnteredForZones">Используйте <strong>enteredTrigger</strong> для зон (лава, вода, телепорты)</li>
-            <li data-i18n="hitboxMemoryLeaks">Не забывайте удалять хитбоксы после окончания раунда и тд, чтобы ничего не багалось</li>
-            <li data-i18n="hitboxCoordinates">Координаты (x, y, z) задают центр хитбокса, а (width, height) - его размеры</li>
-          </ul>
-        </div>
-
-        <div class="api-limitations">
-          <h4><i class="fas fa-exclamation-triangle"></i> <span data-i18n="hitboxLimitations">Ограничения</span></h4>
-          <ul>
-            <li data-i18n="hitboxMinSize">Минимальный размер хитбокса: 1x1</li>
-            <li data-i18n="hitboxMaxSize">Максимальный размер хитбокса по рекомендации: 10x10(иначе он выйдет слишком большим)</li>
+            <li>Проверяйте что <code>Player</code> не null, если скрипт запускается от сервера</li>
+            <li>Для отправки всем игрокам используйте <code>Server.broadcast()</code></li>
           </ul>
         </div>
       </div>
 
-      <!-- Вкладка Сервер (документация Server API) -->
+      <!-- SERVER -->
       <div id="server" class="tab-content">
         <div class="api-header">
-          <div class="api-title" data-i18n="serverApiTitle">Server API</div>
-          <div class="api-description" data-i18n="serverApiDescription">
-            Server API предоставляет мощные инструменты для управления сервером и глобальными игровыми процессами. 
-            Этот API позволяет контролировать все аспекты серверной части игры, от управления игроками до выполнения команд и модификации игрового мира.
-          </div>
+          <div class="api-title">Server API</div>
+          <div class="api-description">Управление сервером: команды, список игроков, broadcast, тики.</div>
         </div>
-
         <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-code"></i>
-            <span data-i18n="playerApiMethods">Методы API</span>
-          </div>
-
+          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
           <div class="api-method">
-            <div class="api-method-name" data-i18n="serverApiExecuteCommand">executeCommand(command)</div>
-            <div class="api-method-description" data-i18n="serverApiExecuteCommandDesc">Этот метод позволяет от имени сервера выполнить команду</div>
-            <div class="api-note">
-              <i class="fas fa-info-circle"></i> <span data-i18n="serverApiExecuteCommandNote">Необязательно писать через [ / ]</span>
-            </div>
-            <div class="api-code-block">
-              Server.executeCommand(<span class="string">"example command"</span>);<br><br>
-              <span class="comment">// пример:</span><br>
-              Server.executeCommand(<span class="string">"time set day"</span>);<br><br>
-              <span class="comment">// еще пример:</span><br>
-              let plr = Server.getRandomPlayer();<br>
-              let name = plr.getName();<br>
-              Server.executeCommand(<span class="string">"give "</span> + name + <span class="string">" minecraft:stick"</span>);
-            </div>
+            <div class="api-method-name">executeCommand(command)</div>
+            <div class="api-method-description">Выполнить команду от имени сервера (без слеша в начале).</div>
+            <div class="api-code-block">Server.executeCommand(<span class="string">"time set day"</span>);<br><br><span class="comment">// Выдать предмет игроку</span><br><span class="keyword">var</span> p = Server.getRandomPlayer();<br>Server.executeCommand(<span class="string">"give "</span> + p.getName() + <span class="string">" minecraft:diamond"</span>);</div>
           </div>
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="serverApiGetOnlinePlayer">getOnlinePlayer()</div>
-            <div class="api-method-description" data-i18n="serverApiGetOnlinePlayerDesc">Получить список игроков (имена)</div>
-            <div class="api-code-block">
-              <span class="comment">// пример:</span><br>
-              let list = Server.getOnlinePlayer();
-            </div>
+            <div class="api-method-name">broadcast(message)</div>
+            <div class="api-method-description">Отправить сообщение всем игрокам сервера.</div>
+            <div class="api-code-block">Server.broadcast(<span class="string">"§6[Сервер] Привет всем!"</span>);</div>
           </div>
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="serverApiGetOnlinePlayer">getOnlinePlayer()</div>
-            <div class="api-method-description" data-i18n="serverApiGetOnlinePlayerDesc">Получить список игроков (имена)</div>
-            <div class="api-code-block">
-              <span class="comment">// пример:</span><br>
-              let list = Server.getOnlinePlayer();
-            </div>
+            <div class="api-method-name">getOnlinePlayer() → String[]</div>
+            <div class="api-method-description">Получить список никнеймов всех онлайн-игроков.</div>
+            <div class="api-code-block"><span class="keyword">var</span> list = Server.getOnlinePlayer();<br>Server.broadcast(<span class="string">"Онлайн: "</span> + list.join(<span class="string">", "</span>));</div>
           </div>
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="">getPlayerCount()</div>
-            <div class="api-method-description" data-i18n="serverApiGetOnlinePlayerDesc">Получить число игроков на сервере</div>
-            <div class="api-code-block">
-              <span class="comment">// пример:</span><br>
-              let count = Server.getPlayerCount();
-            </div>
+            <div class="api-method-name">getPlayerCount() → int</div>
+            <div class="api-method-description">Получить количество онлайн-игроков.</div>
+            <div class="api-code-block"><span class="keyword">var</span> count = Server.getPlayerCount();<br>Server.broadcast(<span class="string">"Игроков онлайн: "</span> + count);</div>
           </div>
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="serverApiGetPlayerByName">getPlayerByName(nickname)</div>
-            <div class="api-method-description" data-i18n="serverApiGetPlayerByNameDesc">Получить игрока по имени</div>
-            <div class="api-code-block">
-              <span class="comment">// пример:</span><br>
-              let player = Server.getPlayerByName(<span class="string">"Nickname"</span>); <span class="comment">// <span data-i18n="serverApiGetPlayerByNameNote">передает PlayerAPI</span></span><br>
-              <span class="comment">// <span data-i18n="serverApiGetPlayerByNameNote2">после этого теперь player у нас является зависимым от PlayerAPI</span></span>
-            </div>
+            <div class="api-method-name">getMaxPlayers() → int</div>
+            <div class="api-method-description">Получить максимальное число слотов сервера.</div>
+            <div class="api-code-block"><span class="keyword">var</span> max = Server.getMaxPlayers();</div>
           </div>
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="serverApiGetRandomPlayer">getRandomPlayer()</div>
-            <div class="api-method-description" data-i18n="serverApiGetRandomPlayerDesc">Получить рандомного игрока</div>
-            <div class="api-code-block">
-              <span class="comment">// пример:</span><br>
-              let player = Server.getRandomPlayer(); <span class="comment">// <span data-i18n="serverApiGetRandomPlayerNote">теперь player у нас становиться зависимым от PlayerAPI</span></span>
-            </div>
+            <div class="api-method-name">getPlayerByName(nickname) → PlayerAPI</div>
+            <div class="api-method-description">Найти игрока по никнейму. Возвращает PlayerAPI или null.</div>
+            <div class="api-code-block"><span class="keyword">var</span> p = Server.getPlayerByName(<span class="string">"Steve"</span>);<br><span class="keyword">if</span> (p) p.sendMessage(<span class="string">"Привет!"</span>);</div>
           </div>
-
           <div class="api-method">
-            <div class="api-method-name" data-i18n="serverApiBroadcast">broadcast(message)</div>
-            <div class="api-method-description" data-i18n="serverApiBroadcastDesc">Отправляет сообщение в чат от имени сервера</div>
-            <div class="api-code-block">
-              <span class="comment">// пример:</span><br>
-              Server.broadcast(<span class="string">"привет мир!"</span>);
-            </div>
+            <div class="api-method-name">getRandomPlayer() → PlayerAPI</div>
+            <div class="api-method-description">Получить случайного онлайн-игрока.</div>
+            <div class="api-code-block"><span class="keyword">var</span> lucky = Server.getRandomPlayer();<br><span class="keyword">if</span> (lucky) lucky.sendMessage(<span class="string">"§dТы выбран!"</span>);</div>
           </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-cog"></i>
-            <span data-i18n="timeApiExamples">Полный пример использования</span>
-          </div>
-          <div class="api-code-block">
-            <span class="comment">// Пример: Выдать рандомному игроку алмаз</span><br>
-            function giveRandomPlayerDiamond() {<br>
-            &nbsp;&nbsp;let randomPlayer = Server.getRandomPlayer();<br>
-            &nbsp;&nbsp;if (randomPlayer) {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;let playerName = randomPlayer.getName();<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;Server.executeCommand(<span class="string">"give "</span> + playerName + <span class="string">" minecraft:diamond"</span>);<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;Server.broadcast(<span class="string">"Игрок "</span> + playerName + <span class="string">" получил алмаз!"</span>);<br>
-            &nbsp;&nbsp;}<br>
-            }
+          <div class="api-method">
+            <div class="api-method-name">getTicks() → long</div>
+            <div class="api-method-description">Получить текущий тик сервера.</div>
+            <div class="api-code-block"><span class="keyword">var</span> ticks = Server.getTicks();</div>
           </div>
         </div>
       </div>
 
-      <!-- Вкладка Время -->
+      <!-- HITBOX -->
+      <div id="hitbox" class="tab-content">
+        <div class="api-header">
+          <div class="api-title">Hitbox API</div>
+          <div class="api-description">Создание невидимых зон-триггеров. Поддерживает именованные хитбоксы (защита от дублирования при перезапуске скрипта), триггер входа, выхода и клика.</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-code"></i> Создание</div>
+          <div class="api-method">
+            <div class="api-method-name">Hitbox.create(x, y, z, width, height) → HitBoxEntity</div>
+            <div class="api-method-description">Создать анонимный хитбокс.</div>
+            <div class="api-code-block"><span class="keyword">var</span> zone = Hitbox.create(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">3.0</span>, <span class="string">2.0</span>);</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">Hitbox.create(name, x, y, z, width, height) → HitBoxEntity</div>
+            <div class="api-method-description">Создать <strong>именованный</strong> хитбокс. При повторном вызове с тем же именем вернёт существующий (не создаст дубликат).</div>
+            <div class="api-code-block"><span class="comment">// Рекомендуемый способ — всегда давать имя</span><br><span class="keyword">var</span> zone = Hitbox.create(<span class="string">"spawn_zone"</span>, <span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">4.0</span>, <span class="string">2.5</span>);</div>
+          </div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-sign-in-alt"></i> onEnter — вход в зону</div>
+          <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:14px;">Срабатывает <strong>один раз</strong> при входе игрока. Повторно сработает только после выхода и нового входа.</p>
+          <div class="api-code-block"><span class="keyword">var</span> zone = Hitbox.create(<span class="string">"my_zone"</span>, <span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>, <span class="string">3.0</span>, <span class="string">2.0</span>);<br><br>Hitbox.onEnter(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§aВы вошли в зону!"</span>);<br>&nbsp;&nbsp;<span class="comment">// e.x, e.y, e.z — координаты игрока</span><br>});</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-sign-out-alt"></i> onExit — выход из зоны</div>
+          <div class="api-code-block">Hitbox.onExit(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§cВы покинули зону"</span>);<br>});</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-hand-pointer"></i> onInteract — клик ПКМ</div>
+          <div class="api-code-block">Hitbox.onInteract(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§bВы нажали на хитбокс!"</span>);<br>});</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-trash-alt"></i> Удаление</div>
+          <div class="api-code-block">Hitbox.remove(zone.getEntity()); <span class="comment">// удалить хитбокс</span></div>
+        </div>
+        <div class="api-best-practices">
+          <h4><i class="fas fa-lightbulb"></i> Важно</h4>
+          <ul>
+            <li>Всегда давайте хитбоксу имя через <code>create("name", ...)</code> — это предотвращает дублирование при перезапуске скрипта</li>
+            <li>Удаляйте хитбоксы при завершении игры/раунда через <code>Hitbox.remove()</code></li>
+            <li>Рекомендуемый макс. размер: 10×10</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- EVENT -->
+      <div id="event" class="tab-content">
+        <div class="api-header">
+          <div class="api-title">Event API</div>
+          <div class="api-description">Подписка на игровые события игрока: прыжок, присед, спринт, разрушение/установка блоков.</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
+          <div class="api-method">
+            <div class="api-method-name">Event.onJump(player, callback)</div>
+            <div class="api-method-description">Срабатывает когда игрок прыгает.</div>
+            <div class="api-code-block">Event.onJump(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Прыжок!"</span>);<br>});</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">Event.onCrouch(player, callback)</div>
+            <div class="api-method-description">Срабатывает при приседании/вставании.</div>
+            <div class="api-code-block">Event.onCrouch(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Присел"</span>);<br>});</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">Event.onSprint(player, callback)</div>
+            <div class="api-method-description">Срабатывает при начале/конце спринта. Объект события содержит <code>isSprinting</code>.</div>
+            <div class="api-code-block">Event.onSprint(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;<span class="keyword">if</span> (e.isSprinting) {<br>&nbsp;&nbsp;&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§6Бежишь!"</span>);<br>&nbsp;&nbsp;}<br>});</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">Event.onBlockBreak(player, callback)</div>
+            <div class="api-method-description">Срабатывает когда игрок ломает блок. Событие содержит <code>player</code>, <code>x</code>, <code>y</code>, <code>z</code>, <code>block</code>.</div>
+            <div class="api-code-block">Event.onBlockBreak(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Сломал блок на "</span> + e.x + <span class="string">" "</span> + e.y + <span class="string">" "</span> + e.z);<br>});</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">Event.onBlockPlace(player, callback)</div>
+            <div class="api-method-description">Срабатывает при установке блока игроком.</div>
+            <div class="api-code-block">Event.onBlockPlace(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Поставил блок!"</span>);<br>});</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WORLD -->
+      <div id="world" class="tab-content">
+        <div class="api-header">
+          <div class="api-title">World API</div>
+          <div class="api-description">Взаимодействие с игровым миром: установка блоков, взрывы.</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
+          <div class="api-method">
+            <div class="api-method-name">World.setBlock(x, y, z, blockId)</div>
+            <div class="api-method-description">Установить блок по координатам. ID блока в формате Minecraft namespace.</div>
+            <div class="api-code-block">World.setBlock(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">"minecraft:diamond_block"</span>);<br>World.setBlock(<span class="string">0</span>, <span class="string">65</span>, <span class="string">0</span>, <span class="string">"minecraft:air"</span>); <span class="comment">// убрать блок</span></div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">World.spawnExplosion(x, y, z, power)</div>
+            <div class="api-method-description">Создать взрыв в точке с заданной силой.</div>
+            <div class="api-code-block">World.spawnExplosion(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">3.0</span>); <span class="comment">// сила как у TNT ~4.0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENTITY -->
+      <div id="entity" class="tab-content">
+        <div class="api-header">
+          <div class="api-title">Entity API</div>
+          <div class="api-description">Создание и управление кастомными NPC-сущностями с GeckoLib-моделями и анимациями.</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-code"></i> Создание сущности</div>
+          <div class="api-method">
+            <div class="api-method-name">Entity.create(pos, name, modelPath, animationPath, texturePath) → EntityHandle</div>
+            <div class="api-method-description">Создать NPC в мире. Пути — относительно ресурспака <code>prochercengine_rp</code>.</div>
+            <div class="api-code-block"><span class="keyword">var</span> npc = Entity.create(<br>&nbsp;&nbsp;{ x: <span class="string">0</span>, y: <span class="string">64</span>, z: <span class="string">0</span> },<br>&nbsp;&nbsp;<span class="string">"Охранник"</span>,<br>&nbsp;&nbsp;<span class="string">"geo/guard.geo.json"</span>,<br>&nbsp;&nbsp;<span class="string">"animations/guard.json"</span>,<br>&nbsp;&nbsp;<span class="string">"textures/guard.png"</span><br>);</div>
+          </div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-wrench"></i> Методы EntityHandle</div>
+          <div class="api-method"><div class="api-method-name">setCustomName(name)</div><div class="api-method-description">Установить имя над головой NPC.</div><div class="api-code-block">npc.setCustomName(<span class="string">"§6Торговец"</span>);</div></div>
+          <div class="api-method"><div class="api-method-name">setModel(modelPath)</div><div class="api-method-description">Сменить модель.</div><div class="api-code-block">npc.setModel(<span class="string">"geo/new_model.geo.json"</span>);</div></div>
+          <div class="api-method"><div class="api-method-name">setTexture(texturePath)</div><div class="api-method-description">Сменить текстуру.</div><div class="api-code-block">npc.setTexture(<span class="string">"textures/new_skin.png"</span>);</div></div>
+          <div class="api-method"><div class="api-method-name">setAnimation(animationPath)</div><div class="api-method-description">Сменить файл анимации.</div><div class="api-code-block">npc.setAnimation(<span class="string">"animations/idle.json"</span>);</div></div>
+          <div class="api-method"><div class="api-method-name">getPos() → Vec3d</div><div class="api-method-description">Получить позицию NPC.</div><div class="api-code-block"><span class="keyword">var</span> pos = npc.getPos();</div></div>
+          <div class="api-method"><div class="api-method-name">kill() / remove()</div><div class="api-method-description">Убить или удалить сущность из мира.</div><div class="api-code-block">npc.kill();<br>npc.remove();</div></div>
+        </div>
+      </div>
+
+      <!-- ITEM -->
+      <div id="item" class="tab-content">
+        <div class="api-header">
+          <div class="api-title">Item API</div>
+          <div class="api-description">Создание кастомных предметов с GeckoLib-моделями, их выдача игрокам и спавн в мире.</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-code"></i> Создание предмета</div>
+          <div class="api-method">
+            <div class="api-method-name">Item.create(name, modelPath, displayPath, animationPath) → ItemHandle</div>
+            <div class="api-method-description">Зарегистрировать кастомный предмет.</div>
+            <div class="api-code-block"><span class="keyword">var</span> sword = Item.create(<br>&nbsp;&nbsp;<span class="string">"MagicSword"</span>,<br>&nbsp;&nbsp;<span class="string">"geo/sword.geo.json"</span>,<br>&nbsp;&nbsp;<span class="string">"display/sword.json"</span>,<br>&nbsp;&nbsp;<span class="string">"animations/sword.json"</span><br>);</div>
+          </div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-wrench"></i> Методы ItemHandle</div>
+          <div class="api-method"><div class="api-method-name">give(playerNameOrPlayerAPI)</div><div class="api-method-description">Выдать предмет игроку по имени или через PlayerAPI.</div><div class="api-code-block">sword.give(<span class="string">"Steve"</span>);<br>sword.give(Player); <span class="comment">// или через объект PlayerAPI</span></div></div>
+          <div class="api-method"><div class="api-method-name">spawn(pos)</div><div class="api-method-description">Заспавнить предмет в мире как дроп.</div><div class="api-code-block">sword.spawn({ x: <span class="string">0</span>, y: <span class="string">65</span>, z: <span class="string">0</span> });</div></div>
+          <div class="api-method"><div class="api-method-name">getName() / getModelPath() / getAnimationPath()</div><div class="api-method-description">Получить параметры предмета.</div><div class="api-code-block"><span class="keyword">var</span> name = sword.getName();</div></div>
+        </div>
+      </div>
+
+      <!-- PARTICLE -->
+      <div id="particle" class="tab-content">
+        <div class="api-header">
+          <div class="api-title">Particle API</div>
+          <div class="api-description">Воспроизведение кастомных частиц из JSON-файлов в директории <code style="color:#8b5cf6;font-family:monospace">config/ProchercEngine/particles/</code>. Поддерживает Bedrock и Java форматы.</div>
+        </div>
+        <div class="api-section">
+          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
+          <div class="api-method">
+            <div class="api-method-name">Particle.spawn(name, x, y, z)</div>
+            <div class="api-method-description">Воспроизвести частицу в координатах (видно всем).</div>
+            <div class="api-code-block">Particle.spawn(<span class="string">"explosion"</span>, <span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>);</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">Particle.spawn(name, x, y, z, player)</div>
+            <div class="api-method-description">Воспроизвести частицу только для конкретного игрока.</div>
+            <div class="api-code-block">Particle.spawn(<span class="string">"sparkle"</span>, <span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, Player.getServerPlayer());</div>
+          </div>
+          <div class="api-method">
+            <div class="api-method-name">Particle.spawn(name, entity)</div>
+            <div class="api-method-description">Воспроизвести частицу на позиции сущности.</div>
+            <div class="api-code-block">Particle.spawn(<span class="string">"aura"</span>, npc.getEntity());</div>
+          </div>
+        </div>
+        <div class="api-best-practices">
+          <h4><i class="fas fa-folder-open"></i> Формат файла частицы</h4>
+          <p>Файлы частиц хранятся в <code>config/ProchercEngine/particles/</code> с расширением <code>.particle.json</code>. Поддерживается как Bedrock-формат частиц, так и Java-формат.</p>
+        </div>
+      </div>
+
+      <!-- TIME -->
       <div id="time" class="tab-content">
         <div class="api-header">
-          <div class="api-title" data-i18n="timeApiTitle">Time API</div>
-          <div class="api-description" data-i18n="timeApiDescription">
-            Time API предоставляет инструменты для управления временем в игре. 
-            Этот API позволяет контролировать игровое время, устанавливать задержки и управлять его потоком.
-          </div>
+          <div class="api-title">Time API</div>
+          <div class="api-description">Управление игровым временем: заморозка, установка, ожидание.</div>
         </div>
-
         <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-code"></i>
-            <span data-i18n="playerApiMethods">Методы API</span>
-          </div>
-
-          <div class="api-method">
-            <div class="api-method-name" data-i18n="timeApiWait">wait(seconds)</div>
-            <div class="api-method-description" data-i18n="timeApiWaitDesc">Ожидание на указанное количество секунд</div>
-            <div class="api-code-block">
-              <span class="comment">// Ждать 1 секунду</span><br>
-              Time.wait(1.0);<br><br>
-              <span class="comment">// Ждать 0.5 секунды</span><br>
-              Time.wait(0.5);<br><br>
-              <span class="comment">// Ждать 3 секунды</span><br>
-              Time.wait(3.0);
-            </div>
-          </div>
-
-          <div class="api-method">
-            <div class="api-method-name" data-i18n="timeApiFreezeTime">freezeTime()</div>
-            <div class="api-method-description" data-i18n="timeApiFreezeTimeDesc">Замораживает игровое время</div>
-            <div class="api-code-block">
-              <span class="comment">// Заморозить время</span><br>
-              Time.freezeTime();
-            </div>
-          </div>
-
-          <div class="api-method">
-            <div class="api-method-name" data-i18n="timeApiFreezeResume">freezeResume()</div>
-            <div class="api-method-description" data-i18n="timeApiFreezeResumeDesc">Восстанавливает нормальное течение времени</div>
-            <div class="api-code-block">
-              <span class="comment">// Разморозить время</span><br>
-              Time.freezeResume();
-            </div>
-          </div>
-
-          <div class="api-method">
-            <div class="api-method-name" data-i18n="timeApiSetTime">setTime(ticks)</div>
-            <div class="api-method-description" data-i18n="timeApiSetTimeDesc">Устанавливает время в игре (0-24000)</div>
-            <div class="api-code-block">
-              <span class="comment">// Установить время на рассвет (0)</span><br>
-              Time.setTime(0);<br><br>
-              <span class="comment">// Установить время на полдень (6000)</span><br>
-              Time.setTime(6000);<br><br>
-              <span class="comment">// Установить время на закат (12000)</span><br>
-              Time.setTime(12000);<br><br>
-              <span class="comment">// Установить время на полночь (18000)</span><br>
-              Time.setTime(18000);
-            </div>
-          </div>
+          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
+          <div class="api-method"><div class="api-method-name">Time.wait(seconds)</div><div class="api-method-description">Приостановить выполнение скрипта на N секунд.</div><div class="api-code-block">Time.wait(<span class="string">3.0</span>); <span class="comment">// ждать 3 секунды</span></div></div>
+          <div class="api-method"><div class="api-method-name">Time.setTime(ticks)</div><div class="api-method-description">Установить время (0–24000).</div><div class="api-code-block">Time.setTime(<span class="string">6000</span>);  <span class="comment">// полдень</span><br>Time.setTime(<span class="string">18000</span>); <span class="comment">// полночь</span></div></div>
+          <div class="api-method"><div class="api-method-name">Time.freezeTime()</div><div class="api-method-description">Заморозить течение времени.</div><div class="api-code-block">Time.freezeTime();</div></div>
+          <div class="api-method"><div class="api-method-name">Time.freezeResume()</div><div class="api-method-description">Возобновить течение времени.</div><div class="api-code-block">Time.freezeResume();</div></div>
         </div>
-
         <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-cog"></i>
-            <span data-i18n="timeApiExamples">Примеры использования</span>
-          </div>
-          <div class="api-code-block">
-            <span class="comment">// <span data-i18n="timeApiSunsetExample">Пример: Создать закат через 5 секунд</span></span><br>
-            function createSunset() {<br>
-            &nbsp;&nbsp;Time.wait(5.0);<br>
-            &nbsp;&nbsp;Time.setTime(12000);<br>
-            &nbsp;&nbsp;Server.broadcast(<span class="string">"Наступил закат!"</span>);<br>
-            }<br><br>
-            
-            <span class="comment">// <span data-i18n="timeApiFreezeExample">Пример: Заморозить время на 10 секунд</span></span><br>
-            function freezeTimeForSeconds(seconds) {<br>
-            &nbsp;&nbsp;Time.freezeTime();<br>
-            &nbsp;&nbsp;Time.wait(seconds);<br>
-            &nbsp;&nbsp;Time.freezeResume();<br>
-            &nbsp;&nbsp;Server.broadcast(<span class="string">"Время снова идет!"</span>);<br>
-            }
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-info-circle"></i>
-            <span data-i18n="timeApiInfo">Информация о времени</span>
-          </div>
-          <div class="api-note">
-            <i class="fas fa-clock"></i> <span data-i18n="timeApiTicks">Игровое время измеряется в тиках (0-24000)</span>
-          </div>
-          <div class="api-code-block">
-            <span class="comment">// Временные метки:</span><br>
-            0&nbsp;&nbsp;&nbsp;&nbsp;= <span data-i18n="timeApiDawn">Рассвет (6:00 утра)</span><br>
-            6000&nbsp;&nbsp;&nbsp;&nbsp;= <span data-i18n="timeApiNoon">Полдень (12:00 дня)</span><br>
-            12000&nbsp;&nbsp;&nbsp;= <span data-i18n="timeApiSunset">Закат (6:00 вечера)</span><br>
-            18000&nbsp;&nbsp;&nbsp;= <span data-i18n="timeApiMidnight">Полночь (12:00 ночи)</span><br>
-            24000&nbsp;&nbsp;&nbsp;= <span data-i18n="timeApiFullCycle">Полный цикл (возвращается к 0)</span>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span data-i18n="playerApiLimitations">Ограничения</span>
-          </div>
-          <div class="api-limitations">
-            <ul>
-              <li data-i18n="timeApiRange">Время должно быть в диапазоне от 0 до 24000</li>
-              <li data-i18n="timeApiWaitBlocks">Метод wait() блокирует выполнение скрипта на указанное время</li>
-              <li data-i18n="timeApiServerOnly">freezeTime() и freezeResume() работают только на сервере</li>
-              <li data-i18n="timeApiSyncIssues">Изменения времени могут не синхронизироваться мгновенно у всех игроков</li>
-            </ul>
-          </div>
+          <div class="api-section-title"><i class="fas fa-info-circle"></i> Тики</div>
+          <div class="api-code-block">0     = Рассвет (6:00)<br>6000  = Полдень (12:00)<br>12000 = Закат (18:00)<br>18000 = Полночь (0:00)<br>24000 = Конец цикла</div>
         </div>
       </div>
 
-      <!-- Вкладка Профиль -->
+      <!-- PROFILE -->
       <div id="profile" class="tab-content">
-        <h2 class="content-title" data-i18n="profileTitle">👤 Мой профиль</h2>
+        <h2 class="content-title">👤 Мой профиль</h2>
         <div class="profile-card">
           <div class="profile-avatar-section">
             <img id="profile-avatar" class="profile-avatar" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s" alt="Avatar">
           </div>
           <div class="profile-info">
             <div class="info-item">
-              <div class="info-label" data-i18n="profileNickname">Никнейм</div>
-              <div class="info-value">
-                <i class="fas fa-user"></i>
-                <span id="profile-nickname" data-i18n="">Загрузка...</span>
-                <img id="profile-premium-badge" class="premium-badge" src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" style="display: none;">
-              </div>
+              <div class="info-label">Никнейм</div>
+              <div class="info-value"><i class="fas fa-user"></i><span id="profile-nickname">Загрузка...</span><img id="profile-premium-badge" class="premium-badge" src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" style="display:none;"></div>
             </div>
             <div class="info-item">
-              <div class="info-label" data-i18n="profileEmail">Email</div>
-              <div class="info-value">
-                <i class="fas fa-envelope"></i>
-                <span id="profile-email">Загрузка...</span>
-              </div>
+              <div class="info-label">Email</div>
+              <div class="info-value"><i class="fas fa-envelope"></i><span id="profile-email">Загрузка...</span></div>
             </div>
             <div class="info-item">
-              <div class="info-label" data-i18n="profilePremium">Premium статус</div>
-              <div class="info-value">
-                <i class="fas fa-crown"></i>
-                <span id="profile-premium" class="premium-status premium-false" data-i18n="profileNotActive">Не активен</span>
-              </div>
+              <div class="info-label">Premium</div>
+              <div class="info-value"><i class="fas fa-crown"></i><span id="profile-premium" class="premium-status premium-false">Не активен</span></div>
             </div>
             <div class="info-item">
-              <div class="info-label" data-i18n="profileDescription">Описание</div>
-              <div class="info-value">
-                <i class="fas fa-quote-right"></i>
-                <span id="profile-description" data-i18n="noDescription">Нет описания</span>
+              <div class="info-label">Описание</div>
+              <div class="info-value"><i class="fas fa-quote-right"></i><span id="profile-description">Нет описания</span></div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Бейджи</div>
+              <div id="profile-badges-display" class="profile-badges-row">
+                <span style="color:var(--text-muted);font-size:0.85rem;">Нет бейджей</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Вкладка Настройки -->
+      <!-- SETTINGS -->
       <div id="settings" class="tab-content">
-        <h2 class="content-title" data-i18n="settingsTitle">⚙️ Настройки</h2>
-        
-        <!-- Поиск пользователей -->
-        <div class="settings-card" style="margin-bottom: 20px;">
-          <h3><i class="fas fa-search"></i> <span data-i18n="settingsSearch">Поиск пользователей</span></h3>
-          <div class="search-container">
-            <div class="search-box">
-              <input type="text" id="search-input" class="search-input" data-i18n-placeholder="settingsSearchPlaceholder" placeholder="Введите никнейм для поиска...">
-              <button id="search-btn" class="search-btn"><i class="fas fa-search"></i> <span data-i18n="settingsSearchButton">Найти</span></button>
-            </div>
-            <div id="search-results" class="users-grid"></div>
+        <h2 class="content-title">⚙️ Настройки</h2>
+        <div class="settings-card" style="margin-bottom:16px;">
+          <h3><i class="fas fa-search"></i> Поиск пользователей</h3>
+          <div class="search-box">
+            <input type="text" id="search-input" class="search-input" placeholder="Введите никнейм...">
+            <button id="search-btn" class="search-btn"><i class="fas fa-search"></i> Найти</button>
           </div>
+          <div id="search-results" class="users-grid"></div>
         </div>
-        
         <div class="settings-grid">
-          <!-- Настройки профиля -->
           <div class="settings-card">
-            <h3><i class="fas fa-user-cog"></i> <span data-i18n="settingsProfile">Настройки профиля</span></h3>
-            
+            <h3><i class="fas fa-user-cog"></i> Профиль</h3>
             <div class="settings-option">
-              <label data-i18n="settingsAvatarUrl">Ссылка на аватарку</label>
-              <input type="text" id="avatar-url" class="settings-input" data-i18n-placeholder="settingsAvatarUrl" placeholder="https://example.com/avatar.jpg">
-              <button id="update-avatar-url" class="update-btn" data-i18n="settingsSetAvatar">Установить аватар</button>
+              <label>Ссылка на аватар</label>
+              <input type="text" id="avatar-url" class="settings-input" placeholder="https://...">
+              <button id="update-avatar-url" class="update-btn">Сохранить аватар</button>
             </div>
-
             <div class="settings-option">
-              <label data-i18n="settingsNickname">Никнейм <span class="char-counter" id="settings-nickname-counter">0/15</span></label>
-              <input type="text" id="settings-nickname" class="settings-input" data-i18n-placeholder="settingsNickname" placeholder="Ваш никнейм" maxlength="15">
-              <button id="update-settings-nickname" class="update-btn" data-i18n="settingsSaveNickname">Сохранить никнейм</button>
+              <label>Никнейм <span class="char-counter" id="settings-nickname-counter">0/15</span></label>
+              <input type="text" id="settings-nickname" class="settings-input" placeholder="Ваш никнейм" maxlength="15">
+              <button id="update-settings-nickname" class="update-btn">Сохранить</button>
             </div>
-            
             <div class="settings-option">
-              <label data-i18n="settingsEmail">Email</label>
-              <input type="email" id="settings-email" class="settings-input" data-i18n-placeholder="settingsEmail" placeholder="Ваш email">
-              <button id="update-settings-email" class="update-btn" data-i18n="settingsSaveEmail">Сохранить email</button>
+              <label>Email</label>
+              <input type="email" id="settings-email" class="settings-input" placeholder="Ваш email">
+              <button id="update-settings-email" class="update-btn">Сохранить</button>
             </div>
-            
             <div class="settings-option">
-              <label data-i18n="settingsDescription">Описание профиля <span class="char-counter" id="settings-description-counter">0/100</span></label>
-              <textarea id="settings-description" class="settings-textarea" data-i18n-placeholder="settingsDescription" placeholder="Расскажите о себе..." maxlength="100"></textarea>
-              <button id="update-description" class="update-btn" data-i18n="settingsSaveDescription">Сохранить описание</button>
+              <label>Описание <span class="char-counter" id="settings-description-counter">0/100</span></label>
+              <textarea id="settings-description" class="settings-textarea" placeholder="Расскажите о себе..." maxlength="100"></textarea>
+              <button id="update-description" class="update-btn">Сохранить</button>
             </div>
           </div>
-
-          <!-- Настройки темы и фона -->
           <div class="settings-card">
-            <h3><i class="fas fa-palette"></i> <span data-i18n="settingsTheme">Тема и фон</span></h3>
-            
+            <h3><i class="fas fa-palette"></i> Тема и фон</h3>
             <div class="settings-option">
-              <label data-i18n="settingsBackgroundUrl">Ссылка на фон профиля</label>
-              <input type="text" id="background-url" class="settings-input" data-i18n-placeholder="settingsBackgroundUrl" placeholder="https://example.com/background.jpg">
-              <button id="update-background-url" class="update-btn" data-i18n="settingsSetBackground">Установить фон</button>
+              <label>Ссылка на фон профиля</label>
+              <input type="text" id="background-url" class="settings-input" placeholder="https://...">
+              <button id="update-background-url" class="update-btn">Установить фон</button>
             </div>
-
             <div class="settings-option">
-              <label data-i18n="settingsColorScheme">Цветовая схема</label>
+              <label>Цветовая схема</label>
               <div class="theme-buttons">
-                <button class="theme-btn active" data-theme="dark"><i class="fas fa-moon"></i> <span data-i18n="settingsDarkTheme">Тёмная</span></button>
-                <button class="theme-btn" data-theme="light"><i class="fas fa-sun"></i> <span data-i18n="settingsLightTheme">Светлая</span></button>
-                <button class="theme-btn" data-theme="purple"><i class="fas fa-gem"></i> <span data-i18n="settingsPurpleTheme">Фиолетовая</span></button>
-                <button class="theme-btn" data-theme="blue"><i class="fas fa-water"></i> <span data-i18n="settingsBlueTheme">Синяя</span></button>
-                <button class="theme-btn" data-theme="green"><i class="fas fa-leaf"></i> <span data-i18n="settingsGreenTheme">Зелёная</span></button>
+                <button class="theme-btn active" data-theme="dark"><i class="fas fa-moon"></i> Тёмная</button>
+                <button class="theme-btn" data-theme="purple"><i class="fas fa-gem"></i> Фиолет</button>
+                <button class="theme-btn" data-theme="blue"><i class="fas fa-water"></i> Синяя</button>
+                <button class="theme-btn" data-theme="green"><i class="fas fa-leaf"></i> Зелёная</button>
               </div>
             </div>
-            
             <div class="settings-option">
-              <label data-i18n="settingsResetBackground">Сбросить фон</label>
-              <button id="reset-background" class="update-btn" style="background: #ff8c7a;" data-i18n="settingsResetBackground">Вернуть стандартный фон</button>
+              <button id="reset-background" class="update-btn" style="background:var(--code-bg);color:var(--red);border:1px solid rgba(244,86,106,0.3);box-shadow:none;">Сбросить фон</button>
             </div>
-            
             <div class="settings-option">
-              <label data-i18n="settingsLanguage">Язык интерфейса</label>
+              <label>Язык</label>
               <select id="language-select" class="settings-select">
-                <option value="ru" data-i18n="russian">Русский</option>
-                <option value="en" data-i18n="english">English</option>
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
               </select>
             </div>
           </div>
-
-          <!-- Опасная зона -->
           <div class="settings-card danger-zone">
-            <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="settingsDangerZone">Опасная зона</span></h3>
+            <h3><i class="fas fa-exclamation-triangle"></i> Опасная зона</h3>
             <div class="settings-option">
-              <button id="delete-account" class="danger-btn" data-i18n="settingsDeleteAccount"><i class="fas fa-trash"></i> Удалить аккаунт</button>
+              <button id="delete-account" class="danger-btn"><i class="fas fa-trash"></i> Удалить аккаунт</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Вкладка Сообщества -->
+      <!-- COMMUNITIES -->
       <div id="communities" class="tab-content">
-        <h2 class="content-title"><i class="fas fa-users"></i> <span data-i18n="communitiesTitle">Сообщества</span></h2>
-        
-        <!-- Кнопки управления сообществами -->
-        <div class="communities-actions" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-          <button id="create-community-btn" class="auth-btn" style="width: auto; padding: 12px 25px;">
-            <i class="fas fa-plus"></i> <span data-i18n="createCommunity">Создать сообщество</span>
-          </button>
-          <button id="my-communities-btn" class="auth-btn secondary" style="width: auto; padding: 12px 25px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);">
-            <i class="fas fa-user"></i> <span data-i18n="myCommunities">Мои сообщества</span>
-          </button>
-          <button id="all-communities-btn" class="auth-btn secondary" style="width: auto; padding: 12px 25px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);">
-            <i class="fas fa-globe"></i> <span data-i18n="allCommunities">Все сообщества</span>
-          </button>
+        <h2 class="content-title"><i class="fas fa-users"></i> Сообщества</h2>
+        <div class="communities-actions">
+          <button id="create-community-btn" class="auth-btn"><i class="fas fa-plus"></i> Создать</button>
+          <button id="my-communities-btn" class="auth-btn secondary"><i class="fas fa-user"></i> Мои</button>
+          <button id="all-communities-btn" class="auth-btn secondary"><i class="fas fa-globe"></i> Все</button>
         </div>
-
-        <!-- Поиск сообществ -->
-        <div class="search-container" style="margin-bottom: 20px;">
-          <div class="search-box">
-            <input type="text" id="community-search-input" class="search-input" data-i18n-placeholder="communitySearchPlaceholder" placeholder="Поиск сообществ...">
-            <button id="community-search-btn" class="search-btn"><i class="fas fa-search"></i></button>
-          </div>
+        <div class="search-box" style="margin-bottom:16px;">
+          <input type="text" id="community-search-input" class="search-input" placeholder="Поиск сообществ...">
+          <button id="community-search-btn" class="search-btn"><i class="fas fa-search"></i></button>
         </div>
-
-        <!-- Сетка сообществ -->
         <div id="communities-grid" class="users-grid">
-          <p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1;" data-i18n="communitiesLoading">
-            Загрузка сообществ...
-          </p>
+          <p style="color:var(--text-dim);text-align:center;grid-column:1/-1;">Загрузка сообществ...</p>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Модальное окно просмотра профиля -->
+  <!-- PROFILE MODAL -->
   <div id="profile-modal" class="modal">
     <div id="modal-background" class="modal-background"></div>
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <div id="modal-profile" class="modal-profile">
-        <!-- Заполняется динамически -->
+      <div id="modal-profile"></div>
+    </div>
+  </div>
+
+  <!-- BADGE MODAL -->
+  <div id="badge-modal" class="modal">
+    <div class="modal-background" onclick="closeBadgeModal()"></div>
+    <div class="modal-content" style="max-width:420px;">
+      <button class="modal-close" onclick="closeBadgeModal()"><i class="fas fa-times"></i></button>
+      <h3 style="color:var(--text);font-size:1.1rem;font-weight:800;margin-bottom:6px;"><i class="fas fa-medal" style="color:var(--accent);margin-right:8px;"></i>Бейджи игрока</h3>
+      <p id="badge-modal-username" style="color:var(--text-muted);font-size:0.85rem;margin-bottom:18px;"></p>
+      <div id="badges-admin-list" class="badges-admin-list"></div>
+      <div class="badge-modal-form" id="badge-add-form">
+        <p style="color:var(--text-dim);font-size:0.85rem;font-weight:700;margin-bottom:10px;margin-top:14px;"><i class="fas fa-plus" style="color:var(--accent);margin-right:6px;"></i>Добавить бейдж</p>
+        <input type="text" id="badge-img-url" placeholder="Ссылка на картинку бейджа">
+        <input type="text" id="badge-name-input" placeholder="Название бейджа">
+        <button onclick="adminAddBadge()" class="update-btn" style="width:100%;"><i class="fas fa-plus"></i> Добавить</button>
       </div>
     </div>
   </div>
-  
-  <!-- Кастомное уведомление -->
+
+  <!-- TOAST -->
   <div id="custom-toast" class="toast">
-    <div class="toast-content">
-      <i class="toast-icon"></i>
-      <span class="toast-message"></span>
-    </div>
+    <div class="toast-content"><i class="toast-icon"></i><span class="toast-message"></span></div>
     <div class="toast-progress"></div>
   </div>
 
-  <!-- Кастомное модальное окно подтверждения -->
+  <!-- CONFIRM -->
   <div id="custom-confirm" class="confirm-modal">
     <div class="confirm-overlay"></div>
     <div class="confirm-content">
-      <div class="confirm-icon">
-        <i class="fas fa-exclamation-triangle"></i>
-      </div>
-      <h3 class="confirm-title" data-i18n="confirmTitle">Подтверждение действия</h3>
+      <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
+      <h3 class="confirm-title">Подтверждение</h3>
       <p class="confirm-message"></p>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-cancel" data-i18n="confirmCancel">Отмена</button>
-        <button class="confirm-btn confirm-ok" data-i18n="confirmOk">Подтвердить</button>
+        <button class="confirm-btn confirm-cancel">Отмена</button>
+        <button class="confirm-btn confirm-ok">Подтвердить</button>
       </div>
     </div>
   </div>
 
-  <!-- Модальное окно создания сообщества -->
+  <!-- Community / Post modals (kept from original, restyled via CSS) -->
   <div id="community-modal" class="modal">
-    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
-    <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-background" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(16px);"></div>
+    <div class="modal-content" style="max-width:600px;">
       <button class="modal-close" onclick="closeCommunityModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-users"></i> <span data-i18n="createCommunityTitle">Создание сообщества</span></h2>
-      
+      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-users"></i> Создание сообщества</h2>
       <form id="create-community-form">
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityName">Название сообщества</label>
-          <input type="text" id="community-name" class="settings-input" required maxlength="50" style="width: 100%;">
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityDescription">Описание</label>
-          <textarea id="community-description" class="settings-textarea" maxlength="200" style="width: 100%; min-height: 80px;"></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityAvatar">Ссылка на аватар</label>
-          <input type="text" id="community-avatar" class="settings-input" style="width: 100%;">
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityCover">Ссылка на обложку</label>
-          <input type="text" id="community-cover" class="settings-input" style="width: 100%;">
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityCategory">Категория</label>
-          <select id="community-category" class="settings-select" style="width: 100%;">
-            <option value="gaming" data-i18n="categoryGaming">Игры</option>
-            <option value="tech" data-i18n="categoryTech">Технологии</option>
-            <option value="art" data-i18n="categoryArt">Искусство</option>
-            <option value="music" data-i18n="categoryMusic">Музыка</option>
-            <option value="science" data-i18n="categoryScience">Наука</option>
-            <option value="other" data-i18n="categoryOther">Другое</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityType">Тип сообщества</label>
-          <select id="community-type" class="settings-select" style="width: 100%;">
-            <option value="public" data-i18n="typePublic">Публичное</option>
-            <option value="restricted" data-i18n="typeRestricted">Ограниченное</option>
-            <option value="private" data-i18n="typePrivate">Закрытое</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="communityTags">Теги (через запятую)</label>
-          <input type="text" id="community-tags" class="settings-input" style="width: 100%;">
-        </div>
-        
-        <div id="community-error" class="auth-error" style="margin-bottom: 15px;"></div>
-        
-        <button type="submit" class="auth-btn" style="width: 100%;">
-          <i class="fas fa-plus"></i> <span data-i18n="createCommunityBtn">Создать сообщество</span>
-        </button>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Название</label><input type="text" id="community-name" class="settings-input" required maxlength="50" style="width:100%;"></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Описание</label><textarea id="community-description" class="settings-textarea" maxlength="200" style="width:100%;"></textarea></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Аватар (ссылка)</label><input type="text" id="community-avatar" class="settings-input" style="width:100%;"></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Обложка (ссылка)</label><input type="text" id="community-cover" class="settings-input" style="width:100%;"></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Категория</label><select id="community-category" class="settings-select" style="width:100%;"><option value="gaming">Игры</option><option value="tech">Технологии</option><option value="art">Искусство</option><option value="music">Музыка</option><option value="science">Наука</option><option value="other">Другое</option></select></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Тип</label><select id="community-type" class="settings-select" style="width:100%;"><option value="public">Публичное</option><option value="restricted">Ограниченное</option><option value="private">Закрытое</option></select></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Теги (через запятую)</label><input type="text" id="community-tags" class="settings-input" style="width:100%;"></div>
+        <div id="community-error" class="auth-error" style="margin-bottom:15px;"></div>
+        <button type="submit" class="auth-btn" style="width:100%;"><i class="fas fa-plus"></i> Создать</button>
       </form>
     </div>
   </div>
 
-  <!-- Модальное окно просмотра сообщества (посты, участники) -->
   <div id="view-community-modal" class="modal">
-    <div class="modal-background" id="view-community-bg" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
-    <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-background" id="view-community-bg"></div>
+    <div class="modal-content" style="max-width:900px;max-height:90vh;overflow-y:auto;">
       <button class="modal-close" onclick="closeViewCommunityModal()"><i class="fas fa-times"></i></button>
-      <div id="view-community-content">
-        <!-- Заполняется динамически -->
-      </div>
+      <div id="view-community-content"></div>
     </div>
   </div>
 
-  <!-- Модальное окно создания поста -->
   <div id="post-modal" class="modal">
-    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
-    <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-background"></div>
+    <div class="modal-content" style="max-width:600px;">
       <button class="modal-close" onclick="closePostModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-pen"></i> <span data-i18n="createPostTitle">Создание поста</span></h2>
-      
+      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-pen"></i> Создание поста</h2>
       <form id="create-post-form">
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="postTitle">Заголовок</label>
-          <input type="text" id="post-title" class="settings-input" required maxlength="100" style="width: 100%;">
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="postContent">Содержание</label>
-          <textarea id="post-content" class="settings-textarea" required maxlength="5000" style="width: 100%; min-height: 150px;"></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label style="color: rgba(255,255,255,0.8); display: block; margin-bottom: 5px;" data-i18n="postImage">Ссылка на изображение (необязательно)</label>
-          <input type="text" id="post-image" class="settings-input" style="width: 100%;">
-        </div>
-        
-        <div id="post-error" class="auth-error" style="margin-bottom: 15px;"></div>
-        
-        <button type="submit" class="auth-btn" style="width: 100%;">
-          <i class="fas fa-paper-plane"></i> <span data-i18n="createPostBtn">Опубликовать</span>
-        </button>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Заголовок</label><input type="text" id="post-title" class="settings-input" required maxlength="100" style="width:100%;"></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Содержание</label><textarea id="post-content" class="settings-textarea" required maxlength="5000" style="width:100%;min-height:150px;"></textarea></div>
+        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Изображение (необязательно)</label><input type="text" id="post-image" class="settings-input" style="width:100%;"></div>
+        <div id="post-error" class="auth-error" style="margin-bottom:15px;"></div>
+        <button type="submit" class="auth-btn" style="width:100%;"><i class="fas fa-paper-plane"></i> Опубликовать</button>
       </form>
     </div>
   </div>
 
-  <!-- Модальное окно просмотра поста с комментариями -->
   <div id="view-post-modal" class="modal">
-    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
-    <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-background"></div>
+    <div class="modal-content" style="max-width:700px;max-height:90vh;overflow-y:auto;">
       <button class="modal-close" onclick="closeViewPostModal()"><i class="fas fa-times"></i></button>
-      <div id="view-post-content">
-        <!-- Заполняется динамически -->
-      </div>
+      <div id="view-post-content"></div>
     </div>
   </div>
 
-  <!-- Модальное окно списка участников -->
   <div id="members-modal" class="modal">
-    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
-    <div class="modal-content" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+    <div class="modal-background"></div>
+    <div class="modal-content" style="max-width:500px;max-height:80vh;overflow-y:auto;">
       <button class="modal-close" onclick="closeMembersModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-users"></i> <span data-i18n="communityMembers">Участники</span></h2>
-      <div id="members-list">
-        <!-- Заполняется динамически -->
-      </div>
+      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-users"></i> Участники</h2>
+      <div id="members-list"></div>
     </div>
   </div>
-  
-  <!-- Модальное окно приглашения в сообщество -->
+
   <div id="invite-modal" class="modal">
-    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-background"></div>
+    <div class="modal-content" style="max-width:500px;">
       <button class="modal-close" onclick="closeInviteModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-link"></i> <span data-i18n="inviteLink">Ссылка-приглашение</span></h2>
-      
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div id="invite-community-name" style="color: white; font-size: 1.2rem; margin-bottom: 10px;"></div>
-        <p style="color: rgba(255,255,255,0.7);" data-i18n="inviteDescription">Поделитесь этой ссылкой с другими людьми, чтобы они могли присоединиться к сообществу.</p>
-      </div>
-      
-      <div style="margin-bottom: 15px;">
-        <input type="text" id="invite-link" class="settings-input" style="width: 100%; text-align: center;" readonly>
-      </div>
-      
-      <button id="copy-invite-link" class="auth-btn" style="width: 100%; margin-bottom: 10px;">
-        <i class="fas fa-copy"></i> <span data-i18n="copyLink">Копировать ссылку</span>
-      </button>
-      
-      <p id="invite-link-copied" style="color: #2ed573; text-align: center; display: none;" data-i18n="linkCopied">Ссылка скопирована!</p>
+      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-link"></i> Ссылка-приглашение</h2>
+      <div style="text-align:center;margin-bottom:20px;"><div id="invite-community-name" style="color:var(--text);font-size:1.1rem;margin-bottom:10px;"></div><p style="color:var(--text-dim);">Поделитесь ссылкой для приглашения в сообщество.</p></div>
+      <input type="text" id="invite-link" class="settings-input" style="width:100%;text-align:center;margin-bottom:10px;" readonly>
+      <button id="copy-invite-link" class="auth-btn" style="width:100%;margin-bottom:10px;"><i class="fas fa-copy"></i> Копировать</button>
+      <p id="invite-link-copied" style="color:var(--green);text-align:center;display:none;">Скопировано!</p>
     </div>
   </div>
 
-  <!-- Модальное окно верификации сообщества -->
   <div id="verification-modal" class="modal">
-    <div class="modal-background" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
-    <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-background"></div>
+    <div class="modal-content" style="max-width:400px;">
       <button class="modal-close" onclick="closeVerificationModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align: center; margin-bottom: 20px; color: white;"><i class="fas fa-check-circle"></i> <span data-i18n="verifyCommunity">Верификация сообщества</span></h2>
-      
-      <div style="text-align: center; margin-bottom: 20px;">
-        <p style="color: rgba(255,255,255,0.8);" data-i18n="verificationInfo">Верифицированные сообщества имеют значок подтверждения и отображаются в результатах поиска выше.</p>
-      </div>
-      
-      <div id="verification-status" style="margin-bottom: 20px;">
-        <!-- Заполняется динамически -->
-      </div>
-      
-      <button id="request-verification-btn" class="auth-btn" style="width: 100%;">
-        <i class="fas fa-paper-plane"></i> <span data-i18n="requestVerification">Подать заявку на верификацию</span>
-      </button>
+      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-check-circle"></i> Верификация</h2>
+      <p style="color:var(--text-dim);text-align:center;margin-bottom:20px;">Верифицированные сообщества имеют значок и приоритет в поиске.</p>
+      <div id="verification-status" style="margin-bottom:20px;"></div>
+      <button id="request-verification-btn" class="auth-btn" style="width:100%;"><i class="fas fa-paper-plane"></i> Подать заявку</button>
     </div>
   </div>
 
-  <!-- Подключение JavaScript -->
   <script src="translations.js"></script>
   <script src="script.js"></script>
 </body>

@@ -405,23 +405,25 @@
         if (premium) {
           badgesHtml += '<img src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" class="modal-premium-badge">';
         }
+        // Кастомные бейджи
+        const customBadges = userData.badges || {};
+        let customBadgesHtml = '';
+        Object.values(customBadges).forEach(badge => {
+          customBadgesHtml += `<span class="user-badge-item" title="${badge.name}"><img src="${badge.img}" onerror="this.src=''" alt="${badge.name}"><span>${badge.name}</span></span>`;
+        });
         
         // Кнопки админа (если текущий пользователь - админ)
         let adminButtonsHtml = '';
         if (userIsAdmin && !isOwnProfile) {
-          if (isBanned) {
-            adminButtonsHtml = `
-              <div class="modal-admin-buttons">
-                <button class="btn-unban" onclick="unbanUser('${uid}')">${t('unbanUser', currentLang)}</button>
-              </div>
-            `;
-          } else {
-            adminButtonsHtml = `
-              <div class="modal-admin-buttons">
-                <button class="btn-ban" onclick="showBanDialog('${uid}', '${nickname.replace(/'/g, "\\'")}')">${t('banUser', currentLang)}</button>
-              </div>
-            `;
-          }
+          const banBtn = isBanned
+            ? `<button class="btn-unban" onclick="unbanUser('${uid}')">${t('unbanUser', currentLang)}</button>`
+            : `<button class="btn-ban" onclick="showBanDialog('${uid}', '${nickname.replace(/'/g, "\\'")}')"> ${t('banUser', currentLang)}</button>`;
+          adminButtonsHtml = `
+            <div class="modal-admin-buttons">
+              ${banBtn}
+              <button class="btn-add-badge" onclick="openBadgeModal('${uid}', '${nickname.replace(/'/g, "\\'")}')"><i class="fas fa-medal"></i> Бейджи</button>
+            </div>
+          `;
         }
         
         // Если пользователь забанен, показываем причину
@@ -441,6 +443,7 @@
             ${nickname}
             ${badgesHtml ? '<div class="badges-container">' + badgesHtml + '</div>' : ''}
           </div>
+          ${customBadgesHtml ? `<div class="badges-container" style="margin-bottom:10px;">${customBadgesHtml}</div>` : ''}
           ${emailHtml}
           <div class="modal-detail">
             <div class="modal-detail-label"><i class="fas fa-quote-right"></i> ${t('profileDescription', currentLang)}</div>
@@ -917,6 +920,12 @@
         if (user.premium) {
           badgesHtml += `<img src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" class="premium-badge">`;
         }
+        // Кастомные бейджи в карточке
+        if (user.badges) {
+          Object.values(user.badges).forEach(b => {
+            badgesHtml += `<img src="${b.img}" title="${b.name}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;">`;
+          });
+        }
         
         html += `
           <div class="user-card" onclick="openUserProfile('${user.uid}')">
@@ -995,6 +1004,20 @@
           profilePremium.className = 'premium-status premium-false';
         }
         
+        // Отображаем бейджи профиля
+        const badgesDisplay = document.getElementById('profile-badges-display');
+        if (badgesDisplay) {
+          const customBadges = userData.badges || {};
+          const badgeEntries = Object.values(customBadges);
+          if (badgeEntries.length === 0) {
+            badgesDisplay.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">Нет бейджей</span>';
+          } else {
+            badgesDisplay.innerHTML = badgeEntries.map(b =>
+              `<span class="user-badge-item" title="${b.name}"><img src="${b.img}" alt="${b.name}"><span>${b.name}</span></span>`
+            ).join('');
+          }
+        }
+
         // Обновляем фон
         if (background && background.startsWith('http')) {
           document.body.style.background = `url('${background}')`;
@@ -1100,9 +1123,10 @@
   // Логика вкладок
   function switchTab(tabId) {
     contents.forEach(content => {
-      content.classList.remove('active-content');
+      content.classList.remove('active');
     });
-    document.getElementById(tabId).classList.add('active-content');
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
 
     tabs.forEach(tab => {
       tab.classList.remove('active');
@@ -2506,6 +2530,98 @@ window.showBanDialog = function(uid, nickname) {
   if (reason !== null && reason.trim() !== '') {
     window.banUser(uid, reason.trim());
   }
+};
+
+// ── BADGE SYSTEM ──
+let badgeTargetUid = null;
+
+window.openBadgeModal = async function(uid, nickname) {
+  const database = window.firebaseDatabase;
+  badgeTargetUid = uid;
+
+  document.getElementById('badge-modal-username').textContent = 'Игрок: ' + nickname;
+  document.getElementById('badge-img-url').value = '';
+  document.getElementById('badge-name-input').value = '';
+
+  const badgeModal = document.getElementById('badge-modal');
+  badgeModal.classList.add('active');
+
+  await refreshBadgeList(uid);
+};
+
+async function refreshBadgeList(uid) {
+  const database = window.firebaseDatabase;
+  const listEl = document.getElementById('badges-admin-list');
+  listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem;">Загрузка...</p>';
+
+  try {
+    const snap = await database.ref('users/' + uid + '/badges').once('value');
+    const badges = snap.val();
+
+    if (!badges || Object.keys(badges).length === 0) {
+      listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem;">Нет бейджей</p>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    Object.entries(badges).forEach(([key, badge]) => {
+      const item = document.createElement('div');
+      item.className = 'badge-admin-item';
+      item.innerHTML = `
+        <img src="${badge.img}" alt="${badge.name}" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s'">
+        <span>${badge.name}</span>
+        <button class="badge-remove-btn" onclick="adminRemoveBadge('${uid}', '${key}')"><i class="fas fa-trash"></i></button>
+      `;
+      listEl.appendChild(item);
+    });
+  } catch (e) {
+    listEl.innerHTML = '<p style="color:var(--red);font-size:0.82rem;">Ошибка загрузки</p>';
+  }
+}
+
+window.adminAddBadge = async function() {
+  const database = window.firebaseDatabase;
+  const auth = window.firebaseAuth;
+  const isAdmin = window.isAdminGlobal;
+  const showToast = window.showToastGlobal;
+
+  if (!isAdmin?.(auth?.currentUser)) return;
+
+  const imgUrl = document.getElementById('badge-img-url').value.trim();
+  const name = document.getElementById('badge-name-input').value.trim();
+
+  if (!imgUrl || !name) {
+    showToast('Заполните оба поля', 'error');
+    return;
+  }
+
+  try {
+    const newRef = database.ref('users/' + badgeTargetUid + '/badges').push();
+    await newRef.set({ img: imgUrl, name: name });
+    document.getElementById('badge-img-url').value = '';
+    document.getElementById('badge-name-input').value = '';
+    await refreshBadgeList(badgeTargetUid);
+    showToast('Бейдж добавлен!', 'success');
+  } catch (e) {
+    showToast('Ошибка добавления', 'error');
+  }
+};
+
+window.adminRemoveBadge = async function(uid, key) {
+  const database = window.firebaseDatabase;
+  const showToast = window.showToastGlobal;
+  try {
+    await database.ref('users/' + uid + '/badges/' + key).remove();
+    await refreshBadgeList(uid);
+    showToast('Бейдж удалён', 'info');
+  } catch (e) {
+    showToast('Ошибка удаления', 'error');
+  }
+};
+
+window.closeBadgeModal = function() {
+  document.getElementById('badge-modal').classList.remove('active');
+  badgeTargetUid = null;
 };
 
 // ============ НОВЫЕ ФУНКЦИИ ДЛЯ СООБЩЕСТВ И ПОСТОВ ============
