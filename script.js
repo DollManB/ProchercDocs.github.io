@@ -81,9 +81,6 @@
   const registerNameInput = document.getElementById('register-name');
   const nameHint = document.getElementById('name-hint');
   
-  // Переменные для верификации
-  let pendingVerification = null;
-  let verificationCode = null;
   
   // Список временных email доменов
   const disposableEmailDomains = [
@@ -124,11 +121,6 @@
     return disposableEmailDomains.includes(domain);
   }
   
-  // Функция генерации кода верификации
-  function generateVerificationCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
-  
   // Функция показа формы верификации
   function showVerifyForm() {
     // Скрываем все формы авторизации, кроме verify-form
@@ -141,20 +133,6 @@
     verifyForm.classList.add('active');
     // Скрываем все вкладки
     authTabs.forEach(t => t.classList.remove('active'));
-  }
-  
-  // Функция возврата к форме регистрации
-  function showRegisterForm() {
-    // Скрываем форму верификации
-    verifyForm.classList.remove('active');
-    // Скрываем все формы
-    authForms.forEach(f => f.classList.remove('active'));
-    // Скрываем все вкладки
-    authTabs.forEach(t => t.classList.remove('active'));
-    // Показываем вкладку регистрации
-    document.querySelector('[data-tab="register"]').classList.add('active');
-    // Показываем форму регистрации
-    registerForm.classList.add('active');
   }
   
   // Счетчик символов для никнейма при регистрации
@@ -521,103 +499,81 @@
     }
   });
 
-  // Форма регистрации с кастомной верификацией через код
+  // Форма регистрации — прямая, без email-верификации
+  // Защита: проверка уникальности ника и email в БД перед созданием
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('register-name').value.trim();
     const email = document.getElementById('register-email').value.trim().toLowerCase();
     const password = document.getElementById('register-password').value;
     const confirmPassword = document.getElementById('register-confirm').value;
-    
-    // Валидация никнейма
-    if (name.length > 15) {
-      registerError.textContent = t('nicknameTooLong', currentLang);
-      return;
-    }
-    
-    if (!name) {
-      registerError.textContent = t('enterNickname', currentLang);
-      return;
-    }
-    
-    // Валидация email
-    if (!email || !email.includes('@')) {
-      registerError.textContent = t('emailNotValid', currentLang);
-      return;
-    }
-    
-    // Проверка на временный email
-    if (isDisposableEmail(email)) {
-      registerError.textContent = t('disposableEmail', currentLang);
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      registerError.textContent = t('passwordsNotMatch', currentLang);
-      return;
-    }
-    
-    // Валидация пароля (минимум 6 символов)
-    if (password.length < 6) {
-      registerError.textContent = t('authWeakPassword', currentLang);
-      return;
-    }
-    
+
+    // ── Валидация ──────────────────────────────────────────────────
+    if (!name) { registerError.textContent = t('enterNickname', currentLang); return; }
+    if (name.length > 15) { registerError.textContent = t('nicknameTooLong', currentLang); return; }
+    if (!email || !email.includes('@')) { registerError.textContent = t('emailNotValid', currentLang); return; }
+    if (isDisposableEmail(email)) { registerError.textContent = t('disposableEmail', currentLang); return; }
+    if (password !== confirmPassword) { registerError.textContent = t('passwordsNotMatch', currentLang); return; }
+    if (password.length < 6) { registerError.textContent = t('authWeakPassword', currentLang); return; }
+
+    // Блокируем кнопку чтобы не было двойного сабмита
+    const submitBtn = registerForm.querySelector('button[type="submit"]');
+    if (submitBtn) { submitBtn.disabled = true; }
+
     try {
-      // Проверяем, существует ли пользователь с таким никнеймом в БД
-      const usersRef = database.ref('users');
-      const snapshot = await usersRef.once('value');
-      const users = snapshot.val();
-      
-      if (users) {
-        for (const [uid, userData] of Object.entries(users)) {
-          if (userData.nickname && userData.nickname.toLowerCase() === name.toLowerCase()) {
-            registerError.textContent = t('nicknameExists', currentLang);
-            return;
-          }
-          // Также проверяем email
-          if (userData.email && userData.email.toLowerCase() === email) {
-            registerError.textContent = t('authEmailInUse', currentLang);
-            return;
-          }
-        }
+      // ── Защита от дублей: проверяем ник и email по базе ──────────
+      // Используем индексный узел nicknames_index для быстрой проверки
+      // (вместо полного скана users/)
+      const nicknameKey = name.toLowerCase().replace(/[^a-z0-9а-яё]/gi, '_');
+      const emailKey = email.replace(/[.@]/g, '_');
+
+      const [nickSnap, emailSnap] = await Promise.all([
+        database.ref('nicknames_index/' + nicknameKey).once('value'),
+        database.ref('emails_index/' + emailKey).once('value')
+      ]);
+
+      if (nickSnap.exists()) {
+        registerError.textContent = t('nicknameExists', currentLang);
+        if (submitBtn) submitBtn.disabled = false;
+        return;
       }
-      
-      // Генерируем код верификации
-      const verifyCode = generateVerificationCode();
-      const tempId = 'temp_' + Date.now();
-      
-      // Сохраняем данные для верификации во временном узле
-      await database.ref('pending_verification/' + tempId).set({
+      if (emailSnap.exists()) {
+        registerError.textContent = t('authEmailInUse', currentLang);
+        if (submitBtn) submitBtn.disabled = false;
+        return;
+      }
+
+      // ── Создаём аккаунт в Firebase Auth ──────────────────────────
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+
+      await user.updateProfile({ displayName: name });
+
+      // ── Записываем данные атомарно (multi-path update) ────────────
+      const updates = {};
+      updates['users/' + user.uid] = {
         nickname: name,
         email: email,
-        password: password,
-        code: verifyCode,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        expires: Date.now() + 15 * 60 * 1000 // 15 минут
-      });
-      
-      // Сохраняем временные данные для использования при подтверждении
-      pendingVerification = {
-        tempId: tempId,
-        email: email,
-        password: password,
-        name: name
+        avatar: DEFAULT_AVATAR,
+        background: DEFAULT_BACKGROUND,
+        description: '',
+        premium: false,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
       };
-      verificationCode = verifyCode;
-      
-      // Показываем форму верификации
-      showVerifyForm();
-      
-      // Для демонстрации - показываем код в консоли и уведомлении
-      // В реальном приложении код отправляется на email через SMTP
-      console.log('Код верификации для', email + ':', verifyCode);
-      showToast(t('verifyCodeSent', currentLang) + ' (код: ' + verifyCode + ')', 'info', 15000);
-      
+      // Индексы для защиты от дублей (значение = uid)
+      updates['nicknames_index/' + nicknameKey] = user.uid;
+      updates['emails_index/' + emailKey] = user.uid;
+
+      await database.ref().update(updates);
+
+      await handleAuthSuccess(user, 'register');
+
     } catch (error) {
       console.error('Ошибка регистрации:', error);
       registerError.textContent = getAuthErrorMessage(error.code);
       setTimeout(() => registerError.textContent = '', 5000);
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
 
