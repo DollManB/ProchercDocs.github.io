@@ -1,1127 +1,1304 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ProchercEngine — Docs</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-storage-compat.js"></script>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .badge-new {
-      display: inline-block;
-      background: linear-gradient(135deg, var(--green), #16a07a);
-      color: #06090d;
-      font-size: 0.6rem;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 50px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      vertical-align: middle;
-      margin-left: 4px;
-    }
-    .badge-updated {
-      display: inline-block;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: white;
-      font-size: 0.6rem;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 50px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      vertical-align: middle;
-      margin-left: 4px;
-    }
-    .fraction-card {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-bottom: 10px;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-    .fraction-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-    }
-    .fraction-neutral .fraction-icon { background: rgba(245,166,35,0.15); color: var(--yellow); }
-    .fraction-aggressive .fraction-icon { background: rgba(244,86,106,0.15); color: var(--red); }
-    .fraction-peaceful .fraction-icon { background: rgba(34,211,160,0.15); color: var(--green); }
-    .fraction-name { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; }
-    .fraction-neutral .fraction-name { color: var(--yellow); }
-    .fraction-aggressive .fraction-name { color: var(--red); }
-    .fraction-peaceful .fraction-name { color: var(--green); }
-    .fraction-desc { color: var(--text-dim); font-size: 0.83rem; line-height: 1.5; }
-
-    .cmd-card {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-bottom: 12px;
-    }
-    .cmd-name {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--accent2);
-      margin-bottom: 6px;
-    }
-    .cmd-desc { color: var(--text-dim); font-size: 0.87rem; margin-bottom: 10px; line-height: 1.5; }
-
-    .sound-category {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 18px 0 10px;
-    }
-    .sound-category::before, .sound-category::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProchercEngine - Документация</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">ProchercEngine</span>
+        </div>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Поиск..." autocomplete="off">
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Начало работы</div>
+            <a href="#intro" class="nav-link active">Введение</a>
+            <a href="#installation" class="nav-link">Установка</a>
+            <a href="#first-script" class="nav-link">Первый скрипт</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">API Справочник</div>
+            <a href="#player-api" class="nav-link">Player</a>
+            <a href="#world-api" class="nav-link">World</a>
+            <a href="#entity-api" class="nav-link">Entity</a>
+            <a href="#item-api" class="nav-link">Item</a>
+            <a href="#camera-api" class="nav-link">Camera</a>
+            <a href="#async-api" class="nav-link">Async</a>
+            <a href="#event-api" class="nav-link">Event</a>
+            <a href="#sound-api" class="nav-link">Sound</a>
+            <a href="#particle-api" class="nav-link">Particle</a>
+            <a href="#gui-api" class="nav-link">Gui</a>
+            <a href="#hitbox-api" class="nav-link">Hitbox</a>
+            <a href="#server-api" class="nav-link">Server</a>
+            <a href="#time-api" class="nav-link">Time</a>
+            <a href="#keybind-api" class="nav-link">KeyBind</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Дополнительно</div>
+            <a href="#java-interop" class="nav-link">Java интеграция</a>
+            <a href="#examples" class="nav-link">Примеры</a>
+        </div>
+    </nav>
 
-  <!-- AUTH -->
-  <div id="auth-screen" class="auth-container" style="display:flex;">
-    <div class="auth-card">
-      <div class="auth-header">
-        <h1><i class="fas fa-cube"></i> ProchercEngine</h1>
-        <p data-i18n="authWelcome">Добро пожаловать! Пожалуйста, войдите или зарегистрируйтесь</p>
-      </div>
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login" data-i18n="authLogin">Вход</button>
-        <button class="auth-tab" data-tab="register" data-i18n="authRegister">Регистрация</button>
-      </div>
-      <div class="auth-form-container">
-        <form id="login-form" class="auth-form active">
-          <div class="form-group"><i class="fas fa-envelope"></i><input type="email" id="login-email" placeholder="Email" required></div>
-          <div class="form-group"><i class="fas fa-lock"></i><input type="password" id="login-password" placeholder="Пароль" required></div>
-          <div id="login-error" class="auth-error"></div>
-          <button type="submit" class="auth-btn"><i class="fas fa-sign-in-alt"></i> <span data-i18n="authSignIn">Войти</span></button>
-        </form>
-        <form id="register-form" class="auth-form">
-          <div class="form-group"><i class="fas fa-user"></i><input type="text" id="register-name" placeholder="Имя" required maxlength="15"><span class="input-hint" id="name-hint">0/15</span></div>
-          <div class="form-group"><i class="fas fa-envelope"></i><input type="email" id="register-email" placeholder="Email" required></div>
-          <div class="form-group"><i class="fas fa-lock"></i><input type="password" id="register-password" placeholder="Пароль" required></div>
-          <div class="form-group"><i class="fas fa-lock"></i><input type="password" id="register-confirm" placeholder="Подтвердите пароль" required></div>
-          <div id="register-error" class="auth-error"></div>
-          <button type="submit" class="auth-btn"><i class="fas fa-user-plus"></i> <span data-i18n="authSignUp">Зарегистрироваться</span></button>
-        </form>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN -->
-  <div id="main-content" class="glass-container" style="display:none;">
-    <div class="top-bar">
-      <div class="left-section">
-        <div id="header-profile" class="header-profile" onclick="switchTab('profile')">
-          <img id="header-avatar" class="header-avatar" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s" alt="Avatar">
-          <div class="header-info">
-            <div class="header-name">
-              <span id="header-nickname">Загрузка...</span>
-              <img id="header-premium-badge" class="premium-badge" src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" style="display:none;">
+    <main class="content">
+        <!-- Intro Section -->
+        <section id="intro" class="section">
+            <h1 class="section-title">
+                <span class="title-icon">⚡</span>
+                ProchercEngine
+            </h1>
+            <p class="section-desc">
+                Мощный скриптовый движок для Minecraft на основе Rhino JavaScript. 
+                Создавайте катсцены, NPC, кастомные предметы и интерактивные механики без компиляции модов.
+            </p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎬</div>
+                    <h3>Катсцены</h3>
+                    <p>Создавайте кинематографичные сцены с плавными перемещениями камеры и таймлайнами</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>NPC с AI</h3>
+                    <p>Создавайте кастомных NPC с моделями, анимациями и поведением</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>События</h3>
+                    <p>Реагируйте на действия игроков: прыжки, атаки, взаимодействие с блоками</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>GUI</h3>
+                    <p>Создавайте кастомные интерфейсы с кнопками, изображениями и панелями</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <h3>Частицы</h3>
+                    <p>Bedrock-стиль частиц с поддержкой Snowstorm формата</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Java интеграция</h3>
+                    <p>Полный доступ к Minecraft API через Java() функцию</p>
+                </div>
             </div>
-            <span id="header-email" class="header-email">Загрузка...</span>
-          </div>
-        </div>
-        <button class="icon-btn settings-btn" onclick="switchTab('settings')" title="Настройки"><i class="fas fa-cog"></i></button>
-        <button class="icon-btn community-btn" onclick="switchTab('communities')" title="Сообщества"><i class="fas fa-users"></i></button>
-      </div>
-      <div class="topbar-search-wrap" id="topbar-search-wrap">
-        <div class="topbar-search-box">
-          <input type="text" id="topbar-search-input" placeholder="Поиск пользователей..." autocomplete="off">
-          <button id="topbar-search-btn" title="Найти"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="topbar-search-results" id="topbar-search-results">
-          <div class="topbar-search-header">
-            <span>Результаты</span>
-            <button onclick="closeTopbarSearch()" title="Закрыть"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="topbar-search-list" id="topbar-search-list"></div>
-        </div>
-      </div>
-      <div class="right-section">
-        <div class="lang-switcher">
-          <button class="lang-btn active" id="lang-ru" data-lang="ru">RU</button>
-          <button class="lang-btn" id="lang-en" data-lang="en">EN</button>
-        </div>
-        <button id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Выйти</span></button>
-      </div>
-    </div>
+        </section>
 
-    <div class="tabs-nav">
-      <button class="tabs-arrow disabled" id="tabs-prev" onclick="scrollTabs(-1)" title="Назад"><i class="fas fa-chevron-left"></i></button>
-      <div class="tabs" id="tabs-scroll">
-        <button class="tab active" data-tab="player"><i class="fas fa-user"></i> <span class="tab-text" data-i18n="tabPlayer">Игрок</span></button>
-        <button class="tab" data-tab="server"><i class="fas fa-server"></i> <span class="tab-text" data-i18n="tabServer">Сервер</span></button>
-        <button class="tab" data-tab="entity"><i class="fas fa-dragon"></i> <span class="tab-text">Entity</span></button>
-        <button class="tab" data-tab="sound"><i class="fas fa-volume-up"></i> <span class="tab-text">Sound <span class="badge-new">new</span></span></button>
-        <button class="tab" data-tab="hitbox"><i class="fas fa-vector-square"></i> <span class="tab-text" data-i18n="tabHitbox">Hitbox</span></button>
-        <button class="tab" data-tab="event"><i class="fas fa-bolt"></i> <span class="tab-text">Event</span></button>
-        <button class="tab" data-tab="world"><i class="fas fa-globe"></i> <span class="tab-text">World</span></button>
-        <button class="tab" data-tab="item"><i class="fas fa-box-open"></i> <span class="tab-text">Item</span></button>
-        <button class="tab" data-tab="particle"><i class="fas fa-star"></i> <span class="tab-text">Particle</span></button>
-        <button class="tab" data-tab="time"><i class="fas fa-clock"></i> <span class="tab-text" data-i18n="tabTime">Время</span></button>
-        <button class="tab" data-tab="resourcepack"><i class="fas fa-folder-open"></i> <span class="tab-text">Ресурспак <span class="badge-new">new</span></span></button>
-        <button class="tab" data-tab="commands"><i class="fas fa-terminal"></i> <span class="tab-text">Команды <span class="badge-new">new</span></span></button>
-      </div>
-      <button class="tabs-arrow" id="tabs-next" onclick="scrollTabs(1)" title="Вперёд"><i class="fas fa-chevron-right"></i></button>
-    </div>
-
-    <div class="content-container">
-
-      <!-- ══════════════════════════════ PLAYER ══════════════════════════════ -->
-      <div id="player" class="tab-content active">
-        <div class="api-header">
-          <div class="api-title">Player API</div>
-          <div class="api-description">Инструменты для взаимодействия с игроком: сообщения, телепорт, позиция, ввод данных и многое другое. Объект <code style="color:#8b5cf6;font-family:monospace">Player</code> доступен в скриптах, запущенных от имени игрока, либо получен через <code style="color:#8b5cf6;font-family:monospace">Server</code>.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
-          <div class="api-method">
-            <div class="api-method-name">getName() → String</div>
-            <div class="api-method-description">Получить никнейм игрока.</div>
-            <div class="api-code-block"><span class="keyword">var</span> name = Player.getName();<br>Player.sendMessage(<span class="string">"Привет, "</span> + name + <span class="string">"!"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">sendMessage(text)</div>
-            <div class="api-method-description">Отправить игроку сообщение в чат. Поддерживает §-коды цвета.</div>
-            <div class="api-code-block">Player.sendMessage(<span class="string">"§aЗелёный текст"</span>);<br>Player.sendMessage(<span class="string">"§cКрасный текст"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">teleport(x, y, z)</div>
-            <div class="api-method-description">Телепортировать игрока на координаты.</div>
-            <div class="api-code-block">Player.teleport(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getPos() → Vec3d</div>
-            <div class="api-method-description">Получить текущую позицию игрока. Возвращает объект с полями <code>.x</code>, <code>.y</code>, <code>.z</code>.</div>
-            <div class="api-code-block"><span class="keyword">var</span> p = Player.getPos();<br>Player.sendMessage(<span class="string">"X: "</span> + p.x + <span class="string">" Y: "</span> + p.y + <span class="string">" Z: "</span> + p.z);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">input(prompt, callback)</div>
-            <div class="api-method-description">Запросить у игрока ввод текста через чат. Callback вызывается с введённой строкой.</div>
-            <div class="api-code-block">Player.input(<span class="string">"Введите ваше имя:"</span>, <span class="keyword">function</span>(answer) {<br>&nbsp;&nbsp;Player.sendMessage(<span class="string">"Вы ввели: "</span> + answer);<br>});</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getServerPlayer() → ServerPlayerEntity</div>
-            <div class="api-method-description">Получить нативный объект <a href="https://maven.fabricmc.net/docs/yarn-1.20.1+build.1/net/minecraft/server/network/ServerPlayerEntity.html" target="_blank" class="api-link">ServerPlayerEntity</a> для низкоуровневых операций.</div>
-            <div class="api-code-block"><span class="keyword">var</span> sp = Player.getServerPlayer();</div>
-          </div>
-        </div>
-        <div class="api-best-practices">
-          <h4><i class="fas fa-lightbulb"></i> Советы</h4>
-          <ul>
-            <li>Проверяйте что <code>Player</code> не null, если скрипт запускается от сервера</li>
-            <li>Для отправки всем игрокам используйте <code>Server.broadcast()</code></li>
-            <li>Чтобы получить PlayerAPI другого игрока — используйте <code>Server.getPlayerByName()</code></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ SERVER ══════════════════════════════ -->
-      <div id="server" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Server API</div>
-          <div class="api-description">Управление сервером: команды, список игроков, broadcast, тики.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
-          <div class="api-method">
-            <div class="api-method-name">executeCommand(command)</div>
-            <div class="api-method-description">Выполнить команду от имени сервера (без слеша в начале).</div>
-            <div class="api-code-block">Server.executeCommand(<span class="string">"time set day"</span>);<br><br><span class="comment">// Выдать предмет игроку</span><br><span class="keyword">var</span> p = Server.getRandomPlayer();<br>Server.executeCommand(<span class="string">"give "</span> + p.getName() + <span class="string">" minecraft:diamond"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">broadcast(message)</div>
-            <div class="api-method-description">Отправить сообщение всем игрокам сервера.</div>
-            <div class="api-code-block">Server.broadcast(<span class="string">"§6[Сервер] Привет всем!"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getOnlinePlayer() → String[]</div>
-            <div class="api-method-description">Получить список никнеймов всех онлайн-игроков.</div>
-            <div class="api-code-block"><span class="keyword">var</span> list = Server.getOnlinePlayer();<br>Server.broadcast(<span class="string">"Онлайн: "</span> + list.join(<span class="string">", "</span>));</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getPlayerCount() → int</div>
-            <div class="api-method-description">Получить количество онлайн-игроков.</div>
-            <div class="api-code-block"><span class="keyword">var</span> count = Server.getPlayerCount();</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getMaxPlayers() → int</div>
-            <div class="api-method-description">Получить максимальное число слотов сервера.</div>
-            <div class="api-code-block"><span class="keyword">var</span> max = Server.getMaxPlayers();</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getPlayerByName(nickname) → PlayerAPI</div>
-            <div class="api-method-description">Найти игрока по никнейму. Возвращает PlayerAPI или null.</div>
-            <div class="api-code-block"><span class="keyword">var</span> p = Server.getPlayerByName(<span class="string">"Steve"</span>);<br><span class="keyword">if</span> (p) p.sendMessage(<span class="string">"Привет!"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getRandomPlayer() → PlayerAPI</div>
-            <div class="api-method-description">Получить случайного онлайн-игрока.</div>
-            <div class="api-code-block"><span class="keyword">var</span> lucky = Server.getRandomPlayer();<br><span class="keyword">if</span> (lucky) lucky.sendMessage(<span class="string">"§dТы выбран!"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">getTicks() → long</div>
-            <div class="api-method-description">Получить текущий тик сервера (20 тиков = 1 секунда).</div>
-            <div class="api-code-block"><span class="keyword">var</span> ticks = Server.getTicks();</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ ENTITY ══════════════════════════════ -->
-      <div id="entity" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Entity API <span class="badge-updated">updated</span></div>
-          <div class="api-description">Создание и полное управление кастомными NPC: позиция при спавне через <code style="color:#8b5cf6;font-family:monospace">pos()</code>, движение, взгляд, фракции, анимации. NPC используют GeckoLib-модели из ресурспака <code style="color:#8b5cf6;font-family:monospace">prochercengine_rp/</code>.</div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-plus-circle"></i> Создание NPC</div>
-          <div class="api-method">
-            <div class="api-method-name">Entity.create(pos, name, modelPath, animPath, texturePath) → EntityHandle</div>
-            <div class="api-method-description">Создать NPC в мире. Позиция задаётся через глобальную функцию <code>pos(x, y, z)</code>. Пути к файлам — относительно папки <code>prochercengine_rp/</code>.</div>
-            <div class="api-code-block"><span class="keyword">var</span> npc = Entity.create(<br>&nbsp;&nbsp;pos(<span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>),&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// позиция спавна</span><br>&nbsp;&nbsp;<span class="string">"Охранник"</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// имя над головой</span><br>&nbsp;&nbsp;<span class="string">"geo/plr_model.geo.json"</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// GeckoLib .geo.json</span><br>&nbsp;&nbsp;<span class="string">"animations/player.animation.json"</span>,<br>&nbsp;&nbsp;<span class="string">"textures/stepan.png"</span><br>);</div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-walking"></i> Движение</div>
-          <div class="api-method">
-            <div class="api-method-name">npc.move(pos) <span class="badge-new">new</span></div>
-            <div class="api-method-description">Отправить NPC идти к указанной позиции (стандартная скорость 1.0). NPC использует навигацию — обходит препятствия.</div>
-            <div class="api-code-block">npc.move(pos(<span class="string">10</span>, <span class="string">-60</span>, <span class="string">5</span>));</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">npc.move(pos, speed) <span class="badge-new">new</span></div>
-            <div class="api-method-description">Идти к позиции с заданной скоростью (1.0 = норма, 1.5 = быстро, 2.0 = бегом).</div>
-            <div class="api-code-block">npc.move(pos(<span class="string">10</span>, <span class="string">-60</span>, <span class="string">5</span>), <span class="string">1.5</span>);</div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-eye"></i> Взгляд</div>
-          <div class="api-method">
-            <div class="api-method-name">npc.look(pos) <span class="badge-new">new</span></div>
-            <div class="api-method-description">Разово повернуть NPC в сторону позиции.</div>
-            <div class="api-code-block">npc.look(pos(<span class="string">0</span>, <span class="string">-60</span>, <span class="string">10</span>));</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">npc.lookAlways(pos | PlayerAPI) <span class="badge-new">new</span></div>
-            <div class="api-method-description">Постоянно смотреть на указанную позицию или на игрока (каждый тик). Принимает <code>pos(x,y,z)</code> или объект <code>PlayerAPI</code>.</div>
-            <div class="api-code-block"><span class="comment">// Смотреть на точку вечно</span><br>npc.lookAlways(pos(<span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>));<br><br><span class="comment">// Смотреть на конкретного игрока</span><br><span class="keyword">var</span> plr = Server.getRandomPlayer();<br>npc.lookAlways(plr);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">npc.stopAlwaysLook() <span class="badge-new">new</span></div>
-            <div class="api-method-description">Остановить постоянный взгляд (NPC вернётся к обычному AI-поведению).</div>
-            <div class="api-code-block">npc.stopAlwaysLook();</div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-shield-alt"></i> Фракции</div>
-          <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:14px;">Фракция определяет поведение NPC по отношению к игрокам. Сохраняется в NBT при перезагрузке мира.</p>
-
-          <div class="fraction-card fraction-neutral">
-            <div class="fraction-icon"><i class="fas fa-balance-scale"></i></div>
-            <div>
-              <div class="fraction-name">"Neutral"</div>
-              <div class="fraction-desc">Мирный. Не нападает сам, но <strong>ответит ударом</strong> если его атаковать. Поведение по умолчанию.</div>
+        <!-- Installation Section -->
+        <section id="installation" class="section">
+            <h2 class="section-title">Установка</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Установите мод</h4>
+                        <p>Поместите файл мода в папку <code>mods/</code></p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Создайте папку скриптов</h4>
+                        <p>Скрипты хранятся в <code>config/ProchercEngine/scripts/</code></p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Создайте первый скрипт</h4>
+                        <p>Файлы скриптов имеют расширение <code>.pec</code></p>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="fraction-card fraction-aggressive">
-            <div class="fraction-icon"><i class="fas fa-skull"></i></div>
-            <div>
-              <div class="fraction-name">"Aggressive"</div>
-              <div class="fraction-desc">Агрессивный. Видит игрока в радиусе 16 блоков → идёт к нему и <strong>атакует в ближнем бою</strong>.</div>
+
+            <div class="info-box">
+                <strong>Команды движка:</strong>
+                <ul>
+                    <li><code>/prochercengine run-script &lt;name&gt;</code> - Запустить скрипт</li>
+                    <li><code>/prochercengine stop-script &lt;name&gt;</code> - Остановить скрипт</li>
+                    <li><code>/prochercengine list</code> - Список скриптов</li>
+                    <li><code>/prochercengine list-running</code> - Запущенные скрипты</li>
+                    <li><code>/prochercengine start-player &lt;player&gt; &lt;script&gt;</code> - Запустить для игрока</li>
+                </ul>
             </div>
-          </div>
-          <div class="fraction-card fraction-peaceful">
-            <div class="fraction-icon"><i class="fas fa-dove"></i></div>
-            <div>
-              <div class="fraction-name">"Peaceful"</div>
-              <div class="fraction-desc">Мирный абсолютно. <strong>Не атакует никогда</strong>, даже если его бьют.</div>
+        </section>
+
+        <!-- First Script Section -->
+        <section id="first-script" class="section">
+            <h2 class="section-title">Первый скрипт</h2>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>hello.pec</span>
+                </div>
+                <pre><code>// Отправить сообщение игроку
+Player.sendMessage("§aПривет, " + Player.getName() + "!");
+
+// Телепортировать игрока
+Player.teleport(0, 64, 0);
+
+// Установить блок
+World.setBlock(0, 63, 0, "minecraft:diamond_block");
+
+// Воспроизвести звук
+Sound.playForPlayer("minecraft:entity.experience_orb.pickup");</code></pre>
             </div>
-          </div>
+        </section>
 
-          <div class="api-code-block" style="margin-top:14px;"><span class="keyword">var</span> npc = Entity.create(pos(<span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>), <span class="string">"Враг"</span>, ...);<br><br>npc.setFraction(<span class="string">"Neutral"</span>);&nbsp;&nbsp;&nbsp;<span class="comment">// мирный, но даст сдачи</span><br>npc.setFraction(<span class="string">"Aggressive"</span>); <span class="comment">// атакует при виде игрока</span><br>npc.setFraction(<span class="string">"Peaceful"</span>);&nbsp;&nbsp; <span class="comment">// никогда не атакует</span><br><br><span class="keyword">var</span> f = npc.getFraction(); <span class="comment">// → "NEUTRAL" / "AGGRESSIVE" / "PEACEFUL"</span></div>
-        </div>
+        <!-- Player API -->
+        <section id="player-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Player
+            </h2>
+            <p class="api-desc">Управление игроком, инвентарём, моделями и скинами</p>
 
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-wrench"></i> Остальные методы EntityHandle</div>
-          <div class="api-method"><div class="api-method-name">setCustomName(name)</div><div class="api-method-description">Установить имя над головой NPC (поддерживает §-цвета).</div><div class="api-code-block">npc.setCustomName(<span class="string">"§6Торговец"</span>);</div></div>
-          <div class="api-method"><div class="api-method-name">setModel(modelPath)</div><div class="api-method-description">Сменить GeckoLib-модель на лету.</div><div class="api-code-block">npc.setModel(<span class="string">"geo/new_model.geo.json"</span>);</div></div>
-          <div class="api-method"><div class="api-method-name">setTexture(texturePath)</div><div class="api-method-description">Сменить текстуру.</div><div class="api-code-block">npc.setTexture(<span class="string">"textures/new_skin.png"</span>);</div></div>
-          <div class="api-method"><div class="api-method-name">setAnimation(animPath)</div><div class="api-method-description">Сменить файл анимации.</div><div class="api-code-block">npc.setAnimation(<span class="string">"animations/idle.json"</span>);</div></div>
-          <div class="api-method"><div class="api-method-name">say(text)</div><div class="api-method-description">NPC пишет в общий чат от своего имени.</div><div class="api-code-block">npc.say(<span class="string">"Стой! Кто идёт?"</span>);</div></div>
-          <div class="api-method"><div class="api-method-name">playAnimation(name, mode)</div><div class="api-method-description">Запустить анимацию по имени. Режим: <code>"loop"</code>, <code>"once"</code>.</div><div class="api-code-block">npc.playAnimation(<span class="string">"attack"</span>, <span class="string">"once"</span>);</div></div>
-          <div class="api-method"><div class="api-method-name">stopAnimation()</div><div class="api-method-description">Остановить текущую кастомную анимацию.</div><div class="api-code-block">npc.stopAnimation();</div></div>
-          <div class="api-method"><div class="api-method-name">getPos() → Vec3d</div><div class="api-method-description">Получить текущую позицию NPC.</div><div class="api-code-block"><span class="keyword">var</span> p = npc.getPos();<br>Server.broadcast(<span class="string">"NPC на X:"</span> + p.x);</div></div>
-          <div class="api-method"><div class="api-method-name">getId() → int</div><div class="api-method-description">Получить ID сущности в мире.</div><div class="api-code-block"><span class="keyword">var</span> id = npc.getId();</div></div>
-          <div class="api-method"><div class="api-method-name">kill() / remove()</div><div class="api-method-description"><code>kill()</code> — убить (с анимацией смерти). <code>remove()</code> — мгновенно удалить из мира без анимации.</div><div class="api-code-block">npc.kill();&nbsp;&nbsp;<span class="comment">// с анимацией смерти</span><br>npc.remove(); <span class="comment">// мгновенно</span></div></div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-film"></i> Автоматические анимации</div>
-          <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:10px;">NPC автоматически переключает анимации из файла анимаций — никакого кода не нужно. Названия в файле должны совпадать:</p>
-          <div class="api-code-block"><span class="string">"idle"</span> &nbsp;→ стоит на месте<br><span class="string">"walk"</span> &nbsp;→ идёт (velocity &gt; 0.0001)<br><span class="string">"run"</span> &nbsp;&nbsp;→ бежит (isSprinting = true)</div>
-        </div>
-
-        <div class="api-best-practices">
-          <h4><i class="fas fa-lightbulb"></i> Советы</h4>
-          <ul>
-            <li>Файлы модели, анимаций и текстур кладите в <code>prochercengine_rp/geo/</code>, <code>animations/</code>, <code>textures/</code></li>
-            <li>Фракция сохраняется в NBT — NPC "помнит" её после перезагрузки</li>
-            <li><code>lookAlways(plr)</code> работает каждый тик — не нужен цикл</li>
-            <li>При <code>Aggressive</code> радиус видения игроков — 16 блоков</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ SOUND ══════════════════════════════ -->
-      <div id="sound" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Sound API <span class="badge-new">new</span></div>
-          <div class="api-description">Воспроизведение звуков — у конкретного игрока, на позиции в мире, или сразу всем. Поддерживает кастомные звуки из ресурспака <code style="color:#8b5cf6;font-family:monospace">prochercengine_rp/sounds/</code> и стандартные звуки Minecraft (<code>minecraft:...</code>). Доступен как <code>Sound</code> в скриптах.</div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Воспроизведение</div>
-
-          <div class="sound-category">Конкретному игроку</div>
-
-          <div class="api-method">
-            <div class="api-method-name">Sound.playForPlayer(player, soundId)</div>
-            <div class="api-method-description">Воспроизвести звук у конкретного игрока (только он его слышит). Громкость и высота — по умолчанию 1.0.</div>
-            <div class="api-code-block"><span class="keyword">var</span> plr = Server.getRandomPlayer();<br>Sound.playForPlayer(plr, <span class="string">"prochercengine:my_sound"</span>);<br><br><span class="comment">// Стандартный звук Minecraft:</span><br>Sound.playForPlayer(plr, <span class="string">"minecraft:entity.villager.yes"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Sound.playForPlayer(player, soundId, volume, pitch)</div>
-            <div class="api-method-description">С кастомной громкостью и высотой тона. Volume: 0.0–2.0+. Pitch: 0.5 (низко) — 2.0 (высоко), 1.0 = норма.</div>
-            <div class="api-code-block">Sound.playForPlayer(plr, <span class="string">"prochercengine:fanfare"</span>, <span class="string">1.0</span>, <span class="string">1.5</span>);</div>
-          </div>
-
-          <div class="sound-category">На позиции в мире</div>
-
-          <div class="api-method">
-            <div class="api-method-name">Sound.playAt(pos, soundId)</div>
-            <div class="api-method-description">Воспроизвести звук в точке мира. Minecraft сам определяет кто услышит — зависит от расстояния до игроков.</div>
-            <div class="api-code-block">Sound.playAt(pos(<span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>), <span class="string">"prochercengine:explosion"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Sound.playAt(pos, soundId, volume, pitch)</div>
-            <div class="api-method-description">С кастомными параметрами. Большая громкость увеличивает радиус слышимости.</div>
-            <div class="api-code-block">Sound.playAt(pos(<span class="string">10</span>, <span class="string">64</span>, <span class="string">-5</span>), <span class="string">"minecraft:block.note_block.bell"</span>, <span class="string">2.0</span>, <span class="string">0.8</span>);</div>
-          </div>
-
-          <div class="sound-category">Всем игрокам</div>
-
-          <div class="api-method">
-            <div class="api-method-name">Sound.playAll(soundId)</div>
-            <div class="api-method-description">Воспроизвести звук сразу всем онлайн-игрокам (каждый слышит "у себя").</div>
-            <div class="api-code-block">Sound.playAll(<span class="string">"prochercengine:lobby_music"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Sound.playAll(soundId, volume, pitch)</div>
-            <div class="api-method-description">С кастомными параметрами.</div>
-            <div class="api-code-block">Sound.playAll(<span class="string">"prochercengine:countdown"</span>, <span class="string">1.0</span>, <span class="string">2.0</span>);</div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-stop-circle"></i> Остановка</div>
-          <div class="api-method">
-            <div class="api-method-name">Sound.stopForPlayer(player, soundId)</div>
-            <div class="api-method-description">Остановить конкретный звук у игрока.</div>
-            <div class="api-code-block">Sound.stopForPlayer(plr, <span class="string">"prochercengine:lobby_music"</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Sound.stopAllForPlayer(player)</div>
-            <div class="api-method-description">Остановить все звуки у игрока сразу.</div>
-            <div class="api-code-block">Sound.stopAllForPlayer(plr);</div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-music"></i> Пример: счётчик-отсчёт</div>
-          <div class="api-code-block"><span class="keyword">var</span> count = <span class="string">3</span>;<br><span class="keyword">while</span> (count &gt; <span class="string">0</span>) {<br>&nbsp;&nbsp;Server.broadcast(<span class="string">"§e"</span> + count + <span class="string">"..."</span>);<br>&nbsp;&nbsp;Sound.playAll(<span class="string">"minecraft:block.note_block.pling"</span>, <span class="string">1.0</span>, <span class="string">1.0</span>);<br>&nbsp;&nbsp;Time.wait(<span class="string">1.0</span>);<br>&nbsp;&nbsp;count--;<br>}<br>Server.broadcast(<span class="string">"§aСтарт!"</span>);<br>Sound.playAll(<span class="string">"minecraft:entity.player.levelup"</span>);</div>
-        </div>
-
-        <div class="api-best-practices">
-          <h4><i class="fas fa-lightbulb"></i> Советы</h4>
-          <ul>
-            <li>Кастомные звуки кладите в <code>prochercengine_rp/sounds/</code> в формате <strong>.ogg</strong></li>
-            <li>После добавления .ogg файлов запустите <code>/prochercengine subscribe_sounds</code> — sounds.json создастся автоматически</li>
-            <li>ID кастомного звука: <code>prochercengine:имя_файла</code> (без .ogg)</li>
-            <li>Все стандартные ID звуков Minecraft: <a href="https://minecraft.wiki/w/Sounds.json#Java_Edition_values" target="_blank" class="api-link">minecraft.wiki</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ HITBOX ══════════════════════════════ -->
-      <div id="hitbox" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Hitbox API</div>
-          <div class="api-description">Создание невидимых зон-триггеров. Поддерживает именованные хитбоксы (защита от дублирования при перезапуске скрипта), триггер входа, выхода и клика.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Создание</div>
-          <div class="api-method">
-            <div class="api-method-name">Hitbox.create(x, y, z, width, height) → HitBoxEntity</div>
-            <div class="api-method-description">Создать анонимный хитбокс.</div>
-            <div class="api-code-block"><span class="keyword">var</span> zone = Hitbox.create(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">3.0</span>, <span class="string">2.0</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Hitbox.create(name, x, y, z, width, height) → HitBoxEntity</div>
-            <div class="api-method-description">Создать <strong>именованный</strong> хитбокс. При повторном вызове с тем же именем вернёт существующий (не создаст дубликат).</div>
-            <div class="api-code-block"><span class="comment">// Рекомендуемый способ — всегда давать имя</span><br><span class="keyword">var</span> zone = Hitbox.create(<span class="string">"spawn_zone"</span>, <span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">4.0</span>, <span class="string">2.5</span>);</div>
-          </div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-sign-in-alt"></i> onEnter — вход в зону</div>
-          <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:14px;">Срабатывает <strong>один раз</strong> при входе игрока. Повторно сработает только после выхода и нового входа.</p>
-          <div class="api-code-block"><span class="keyword">var</span> zone = Hitbox.create(<span class="string">"my_zone"</span>, <span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>, <span class="string">3.0</span>, <span class="string">2.0</span>);<br><br>Hitbox.onEnter(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§aВы вошли в зону!"</span>);<br>&nbsp;&nbsp;<span class="comment">// e.x, e.y, e.z — координаты игрока</span><br>});</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-sign-out-alt"></i> onExit — выход из зоны</div>
-          <div class="api-code-block">Hitbox.onExit(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§cВы покинули зону"</span>);<br>});</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-hand-pointer"></i> onInteract — клик ПКМ</div>
-          <div class="api-code-block">Hitbox.onInteract(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§bВы нажали на хитбокс!"</span>);<br>});</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-trash-alt"></i> Удаление</div>
-          <div class="api-code-block">Hitbox.remove(zone.getEntity()); <span class="comment">// удалить хитбокс</span></div>
-        </div>
-        <div class="api-best-practices">
-          <h4><i class="fas fa-lightbulb"></i> Важно</h4>
-          <ul>
-            <li>Всегда давайте хитбоксу имя через <code>create("name", ...)</code> — это предотвращает дублирование при перезапуске скрипта</li>
-            <li>Удаляйте хитбоксы при завершении игры/раунда через <code>Hitbox.remove()</code></li>
-            <li>Рекомендуемый макс. размер: 10×10</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ EVENT ══════════════════════════════ -->
-      <div id="event" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Event API</div>
-          <div class="api-description">Подписка на игровые события игрока: прыжок, присед, спринт, разрушение/установка блоков.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
-          <div class="api-method">
-            <div class="api-method-name">Event.onJump(player, callback)</div>
-            <div class="api-method-description">Срабатывает когда игрок прыгает.</div>
-            <div class="api-code-block">Event.onJump(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Прыжок!"</span>);<br>});</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Event.onCrouch(player, callback)</div>
-            <div class="api-method-description">Срабатывает при приседании/вставании.</div>
-            <div class="api-code-block">Event.onCrouch(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Присел"</span>);<br>});</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Event.onSprint(player, callback)</div>
-            <div class="api-method-description">Срабатывает при начале/конце спринта. Объект события содержит <code>isSprinting</code>.</div>
-            <div class="api-code-block">Event.onSprint(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;<span class="keyword">if</span> (e.isSprinting) {<br>&nbsp;&nbsp;&nbsp;&nbsp;e.player.sendMessage(<span class="string">"§6Бежишь!"</span>);<br>&nbsp;&nbsp;}<br>});</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Event.onBlockBreak(player, callback)</div>
-            <div class="api-method-description">Срабатывает когда игрок ломает блок. Событие содержит <code>player</code>, <code>x</code>, <code>y</code>, <code>z</code>, <code>block</code>.</div>
-            <div class="api-code-block">Event.onBlockBreak(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Сломал блок на "</span> + e.x + <span class="string">" "</span> + e.y + <span class="string">" "</span> + e.z);<br>});</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Event.onBlockPlace(player, callback)</div>
-            <div class="api-method-description">Срабатывает при установке блока игроком.</div>
-            <div class="api-code-block">Event.onBlockPlace(Player.getServerPlayer(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;e.player.sendMessage(<span class="string">"Поставил блок!"</span>);<br>});</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ WORLD ══════════════════════════════ -->
-      <div id="world" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">World API</div>
-          <div class="api-description">Взаимодействие с игровым миром: установка блоков, взрывы.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
-          <div class="api-method">
-            <div class="api-method-name">World.setBlock(x, y, z, blockId)</div>
-            <div class="api-method-description">Установить блок по координатам. ID блока в формате Minecraft namespace.</div>
-            <div class="api-code-block">World.setBlock(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">"minecraft:diamond_block"</span>);<br>World.setBlock(<span class="string">0</span>, <span class="string">65</span>, <span class="string">0</span>, <span class="string">"minecraft:air"</span>); <span class="comment">// убрать блок</span></div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">World.spawnExplosion(x, y, z, power)</div>
-            <div class="api-method-description">Создать взрыв в точке с заданной силой. TNT ≈ 4.0.</div>
-            <div class="api-code-block">World.spawnExplosion(<span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, <span class="string">3.0</span>);</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ ITEM ══════════════════════════════ -->
-      <div id="item" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Item API</div>
-          <div class="api-description">Создание кастомных предметов с GeckoLib-моделями, их выдача игрокам и спавн в мире.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Создание предмета</div>
-          <div class="api-method">
-            <div class="api-method-name">Item.create(name, modelPath, displayPath, animationPath) → ItemHandle</div>
-            <div class="api-method-description">Зарегистрировать кастомный предмет с GeckoLib-моделью.</div>
-            <div class="api-code-block"><span class="keyword">var</span> sword = Item.create(<br>&nbsp;&nbsp;<span class="string">"MagicSword"</span>,<br>&nbsp;&nbsp;<span class="string">"geo/sword.geo.json"</span>,<br>&nbsp;&nbsp;<span class="string">"display/sword.json"</span>,<br>&nbsp;&nbsp;<span class="string">"animations/sword.json"</span><br>);</div>
-          </div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-wrench"></i> Методы ItemHandle</div>
-          <div class="api-method"><div class="api-method-name">give(playerNameOrPlayerAPI)</div><div class="api-method-description">Выдать предмет игроку по имени или через PlayerAPI.</div><div class="api-code-block">sword.give(<span class="string">"Steve"</span>);<br>sword.give(Player); <span class="comment">// или через объект PlayerAPI</span></div></div>
-          <div class="api-method"><div class="api-method-name">spawn(pos)</div><div class="api-method-description">Заспавнить предмет в мире как дроп.</div><div class="api-code-block">sword.spawn(pos(<span class="string">0</span>, <span class="string">65</span>, <span class="string">0</span>));</div></div>
-          <div class="api-method"><div class="api-method-name">getName() / getModelPath() / getAnimationPath()</div><div class="api-method-description">Получить параметры предмета.</div><div class="api-code-block"><span class="keyword">var</span> name = sword.getName();</div></div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ PARTICLE ══════════════════════════════ -->
-      <div id="particle" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Particle API</div>
-          <div class="api-description">Воспроизведение кастомных частиц из JSON-файлов в директории <code style="color:#8b5cf6;font-family:monospace">config/ProchercEngine/particles/</code>.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
-          <div class="api-method">
-            <div class="api-method-name">Particle.spawn(name, x, y, z)</div>
-            <div class="api-method-description">Воспроизвести частицу в координатах (видно всем).</div>
-            <div class="api-code-block">Particle.spawn(<span class="string">"explosion"</span>, <span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>);</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Particle.spawn(name, x, y, z, player)</div>
-            <div class="api-method-description">Воспроизвести частицу только для конкретного игрока.</div>
-            <div class="api-code-block">Particle.spawn(<span class="string">"sparkle"</span>, <span class="string">0</span>, <span class="string">64</span>, <span class="string">0</span>, Player.getServerPlayer());</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Particle.spawn(name, entity)</div>
-            <div class="api-method-description">Воспроизвести частицу на позиции сущности.</div>
-            <div class="api-code-block">Particle.spawn(<span class="string">"aura"</span>, npc.getEntity());</div>
-          </div>
-        </div>
-        <div class="api-best-practices">
-          <h4><i class="fas fa-folder-open"></i> Формат файла частицы</h4>
-          <p>Файлы частиц хранятся в <code>config/ProchercEngine/particles/</code> с расширением <code>.particle.json</code>.</p>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ TIME ══════════════════════════════ -->
-      <div id="time" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Time API</div>
-          <div class="api-description">Управление игровым временем: заморозка, установка, ожидание в скриптах.</div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Методы</div>
-          <div class="api-method"><div class="api-method-name">Time.wait(seconds)</div><div class="api-method-description">Приостановить выполнение скрипта на N секунд.</div><div class="api-code-block">Time.wait(<span class="string">3.0</span>); <span class="comment">// ждать 3 секунды</span></div></div>
-          <div class="api-method"><div class="api-method-name">Time.setTime(ticks)</div><div class="api-method-description">Установить время суток (0–24000).</div><div class="api-code-block">Time.setTime(<span class="string">6000</span>);  <span class="comment">// полдень</span><br>Time.setTime(<span class="string">18000</span>); <span class="comment">// полночь</span></div></div>
-          <div class="api-method"><div class="api-method-name">Time.freezeTime()</div><div class="api-method-description">Заморозить течение времени.</div><div class="api-code-block">Time.freezeTime();</div></div>
-          <div class="api-method"><div class="api-method-name">Time.freezeResume()</div><div class="api-method-description">Возобновить течение времени.</div><div class="api-code-block">Time.freezeResume();</div></div>
-        </div>
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-info-circle"></i> Тики</div>
-          <div class="api-code-block">0     = Рассвет (6:00)<br>6000  = Полдень (12:00)<br>12000 = Закат (18:00)<br>18000 = Полночь (0:00)<br>24000 = Конец цикла</div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ RESOURCE PACK ══════════════════════════════ -->
-      <div id="resourcepack" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Ресурс-пак <span class="badge-new">new</span></div>
-          <div class="api-description">Структура папки <code style="color:#8b5cf6;font-family:monospace">prochercengine_rp/</code> — кастомные модели, анимации, текстуры и звуки для NPC и предметов. Создаётся командой <code>/prochercengine create_resource</code>.</div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-folder-tree"></i> Структура папок</div>
-          <div class="api-code-block">prochercengine_rp/<br>├── pack.mcmeta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// создаётся автоматически</span><br>├── sounds.json&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// регистрация звуков (auto через subscribe_sounds)</span><br>├── geo/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// GeckoLib .geo.json модели</span><br>│&nbsp;&nbsp; └── plr_model.geo.json<br>├── animations/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// .animation.json файлы</span><br>│&nbsp;&nbsp; └── player.animation.json<br>├── textures/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// .png текстуры</span><br>│&nbsp;&nbsp; └── stepan.png<br>└── sounds/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// .ogg звуки</span><br>&nbsp;&nbsp;&nbsp; ├── fanfare.ogg<br>&nbsp;&nbsp;&nbsp; └── ambient/<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; └── fire.ogg</div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-file-audio"></i> Добавление звуков — пошагово</div>
-          <div class="api-method">
-            <div class="api-method-name">Шаг 1 — Создать структуру</div>
-            <div class="api-method-description">Если ресурспак ещё не создан, запустите команду:</div>
-            <div class="api-code-block">/prochercengine create_resource</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Шаг 2 — Добавить .ogg файлы</div>
-            <div class="api-method-description">Положите ваши .ogg файлы в папку <code>prochercengine_rp/sounds/</code>. Можно создавать подпапки.</div>
-            <div class="api-code-block">prochercengine_rp/sounds/fanfare.ogg<br>prochercengine_rp/sounds/ambient/rain.ogg</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Шаг 3 — Зарегистрировать звуки</div>
-            <div class="api-method-description">Запустите команду — она найдёт все .ogg и сгенерирует <code>sounds.json</code> автоматически:</div>
-            <div class="api-code-block">/prochercengine subscribe_sounds<br><br><span class="comment">// Результат в sounds.json:</span><br>{<br>&nbsp;&nbsp;<span class="string">"fanfare"</span>: { <span class="string">"sounds"</span>: [{ <span class="string">"name"</span>: <span class="string">"prochercengine:fanfare"</span> }] },<br>&nbsp;&nbsp;<span class="string">"ambient/rain"</span>: { <span class="string">"sounds"</span>: [{ <span class="string">"name"</span>: <span class="string">"prochercengine:ambient/rain"</span> }] }<br>}</div>
-          </div>
-          <div class="api-method">
-            <div class="api-method-name">Шаг 4 — Использовать в скрипте</div>
-            <div class="api-method-description">После перезагрузки ресурспака звуки доступны в Sound API:</div>
-            <div class="api-code-block">Sound.playAll(<span class="string">"prochercengine:fanfare"</span>);<br>Sound.playAll(<span class="string">"prochercengine:ambient/rain"</span>);</div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-cube"></i> Модели GeckoLib</div>
-          <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:12px;">Модели создаются в <a href="https://www.blockbench.net/" target="_blank" class="api-link">Blockbench</a> с форматом <strong>GeckoLib Entity</strong>. Экспортируйте как <code>.geo.json</code> в папку <code>geo/</code>, анимации как <code>.animation.json</code> в <code>animations/</code>.</p>
-          <div class="api-code-block"><span class="comment">// Используем в Entity.create()</span><br><span class="keyword">var</span> npc = Entity.create(<br>&nbsp;&nbsp;pos(<span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>),<br>&nbsp;&nbsp;<span class="string">"Гвардеец"</span>,<br>&nbsp;&nbsp;<span class="string">"geo/guard.geo.json"</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// из geo/</span><br>&nbsp;&nbsp;<span class="string">"animations/guard.animation.json"</span>, <span class="comment">// из animations/</span><br>&nbsp;&nbsp;<span class="string">"textures/guard.png"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// из textures/</span><br>);</div>
-        </div>
-
-        <div class="api-best-practices">
-          <h4><i class="fas fa-lightbulb"></i> Советы</h4>
-          <ul>
-            <li>Ресурспак живёт рядом с сервером (там же где <code>server.jar</code>), а не в <code>config/</code></li>
-            <li>Звуки обязательно должны быть в формате <strong>.ogg</strong> — другие форматы не поддерживаются Minecraft</li>
-            <li>После изменения <code>sounds.json</code> игрокам нужно перезагрузить ресурспак (<kbd>F3</kbd>+<kbd>T</kbd>)</li>
-            <li>Анимации должны содержать состояния <code>idle</code>, <code>walk</code>, <code>run</code> для автопереключения</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════ COMMANDS ══════════════════════════════ -->
-      <div id="commands" class="tab-content">
-        <div class="api-header">
-          <div class="api-title">Команды движка <span class="badge-new">new</span></div>
-          <div class="api-description">Серверные команды для управления скриптами и ресурспаком. Все команды начинаются с <code style="color:#8b5cf6;font-family:monospace">/prochercengine</code>.</div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-scroll"></i> Скрипты</div>
-
-          <div class="cmd-card">
-            <div class="cmd-name">/prochercengine run-script &lt;name&gt;</div>
-            <div class="cmd-desc">Запустить скрипт по имени (без расширения .pec). Скрипты хранятся в <code>config/ProchercEngine/scripts/</code>.</div>
-            <div class="api-code-block">/prochercengine run-script my_minigame<br><span class="comment">// запустит config/ProchercEngine/scripts/my_minigame.pec</span></div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-folder-open"></i> Ресурс-пак</div>
-
-          <div class="cmd-card">
-            <div class="cmd-name">/prochercengine create_resource</div>
-            <div class="cmd-desc">Создаёт папку <code>prochercengine_rp/</code> со всей структурой и базовыми файлами. Безопасно — существующие файлы не перезаписывает.</div>
-            <div class="api-code-block">/prochercengine create_resource<br><br><span class="comment">// Создаёт:</span><br><span class="comment">// prochercengine_rp/geo/</span><br><span class="comment">// prochercengine_rp/animations/</span><br><span class="comment">// prochercengine_rp/textures/</span><br><span class="comment">// prochercengine_rp/sounds/</span><br><span class="comment">// prochercengine_rp/pack.mcmeta</span><br><span class="comment">// prochercengine_rp/sounds.json</span></div>
-          </div>
-
-          <div class="cmd-card">
-            <div class="cmd-name">/prochercengine subscribe_sounds</div>
-            <div class="cmd-desc">Сканирует папку <code>prochercengine_rp/sounds/</code> рекурсивно, находит все <code>.ogg</code> файлы и автоматически генерирует / перезаписывает <code>sounds.json</code>. Запускать каждый раз после добавления новых звуков.</div>
-            <div class="api-code-block">/prochercengine subscribe_sounds<br><br><span class="comment">// Пример вывода:</span><br><span class="comment">// [Engine] sounds.json обновлён! 3 звуков:</span><br><span class="comment">//   • prochercengine:fanfare</span><br><span class="comment">//   • prochercengine:countdown</span><br><span class="comment">//   • prochercengine:ambient/rain</span></div>
-          </div>
-        </div>
-
-        <div class="api-section">
-          <div class="api-section-title"><i class="fas fa-code"></i> Структура скрипта (.pec)</div>
-          <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:12px;">Скрипты пишутся на JavaScript-подобном языке ProchercScript. Файлы с расширением <code>.pec</code>. Комментарий <code>//autorun</code> в первой строке запустит скрипт автоматически при старте сервера.</p>
-          <div class="api-code-block"><span class="comment">// Пример: простой NPC-охранник</span><br><br><span class="keyword">var</span> npc = Entity.create(<br>&nbsp;&nbsp;pos(<span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>),<br>&nbsp;&nbsp;<span class="string">"Охранник"</span>,<br>&nbsp;&nbsp;<span class="string">"geo/guard.geo.json"</span>,<br>&nbsp;&nbsp;<span class="string">"animations/guard.animation.json"</span>,<br>&nbsp;&nbsp;<span class="string">"textures/guard.png"</span><br>);<br><br>npc.setFraction(<span class="string">"Neutral"</span>);<br><br><span class="keyword">var</span> zone = Hitbox.create(<span class="string">"guard_zone"</span>, <span class="string">0</span>, <span class="string">-60</span>, <span class="string">0</span>, <span class="string">5.0</span>, <span class="string">2.5</span>);<br><br>Hitbox.onEnter(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;npc.lookAlways(e.player);<br>&nbsp;&nbsp;npc.say(<span class="string">"Стой! Кто идёт?"</span>);<br>&nbsp;&nbsp;Sound.playForPlayer(e.player, <span class="string">"minecraft:entity.villager.ambient"</span>);<br>});<br><br>Hitbox.onExit(zone.getEntity(), <span class="keyword">function</span>(e) {<br>&nbsp;&nbsp;npc.stopAlwaysLook();<br>});</div>
-        </div>
-
-        <div class="api-best-practices">
-          <h4><i class="fas fa-lightbulb"></i> Советы</h4>
-          <ul>
-            <li>Скрипты запускаются в отдельных потоках — несколько скриптов могут работать одновременно</li>
-            <li>Используйте <code>Time.wait()</code> внутри скриптов для задержек — не Thread.sleep()</li>
-            <li>После изменения звуков всегда запускайте <code>subscribe_sounds</code>, потом попросите игроков нажать <kbd>F3</kbd>+<kbd>T</kbd></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ══════════════════════ PROFILE / SETTINGS / COMMUNITIES (unchanged) ══════════════════════ -->
-      <div id="profile" class="tab-content">
-        <h2 class="content-title">👤 Мой профиль</h2>
-        <div class="profile-card">
-          <div class="profile-avatar-section">
-            <img id="profile-avatar" class="profile-avatar" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s" alt="Avatar">
-          </div>
-          <div class="profile-info">
-            <div class="info-item">
-              <div class="info-label">Никнейм</div>
-              <div class="info-value"><i class="fas fa-user"></i><span id="profile-nickname">Загрузка...</span><img id="profile-premium-badge" class="premium-badge" src="https://liderposm.ru/upload/iblock/ec4/6o0uuv1axgtdzsf9q6c0bti4r2eu6pk6/Galochka.png" style="display:none;"></div>
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">sendMessage</span>
+                    <span class="method-params">(text: String)</span>
+                </div>
+                <p>Отправить сообщение игроку с поддержкой цветовых кодов</p>
+                <div class="code-example">
+                    <pre><code>Player.sendMessage("§aУспех! §7Это зелёное сообщение");</code></pre>
+                </div>
             </div>
-            <div class="info-item">
-              <div class="info-label">Email</div>
-              <div class="info-value"><i class="fas fa-envelope"></i><span id="profile-email">Загрузка...</span></div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">teleport</span>
+                    <span class="method-params">(x: double, y: double, z: double)</span>
+                </div>
+                <p>Телепортировать игрока в указанные координаты</p>
+                <div class="code-example">
+                    <pre><code>Player.teleport(100, 64, -200);</code></pre>
+                </div>
             </div>
-            <div class="info-item">
-              <div class="info-label">Premium</div>
-              <div class="info-value"><i class="fas fa-crown"></i><span id="profile-premium" class="premium-status premium-false">Не активен</span></div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getPos</span>
+                    <span class="method-params">() → Vec3d</span>
+                </div>
+                <p>Получить текущую позицию игрока</p>
+                <div class="code-example">
+                    <pre><code>var pos = Player.getPos();
+Player.sendMessage("X: " + pos.x + ", Y: " + pos.y + ", Z: " + pos.z);</code></pre>
+                </div>
             </div>
-            <div class="info-item">
-              <div class="info-label">Описание</div>
-              <div class="info-value"><i class="fas fa-quote-right"></i><span id="profile-description">Нет описания</span></div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getName</span>
+                    <span class="method-params">() → String</span>
+                </div>
+                <p>Получить имя игрока</p>
             </div>
-            <div class="info-item">
-              <div class="info-label">Бейджи</div>
-              <div id="profile-badges-display" class="profile-badges-row">
-                <span style="color:var(--text-muted);font-size:0.85rem;">Нет бейджей</span>
-              </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">hasItem</span>
+                    <span class="method-params">(itemId: String, count: int) → boolean</span>
+                </div>
+                <p>Проверить наличие предмета в инвентаре</p>
+                <div class="code-example">
+                    <pre><code>if (Player.hasItem("minecraft:diamond", 5)) {
+    Player.sendMessage("§aУ вас есть 5 алмазов!");
+}</code></pre>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div id="settings" class="tab-content">
-        <h2 class="content-title">⚙️ Настройки</h2>
-        <!-- Скрытые заглушки для совместимости с script.js -->
-        <div style="display:none;">
-          <input id="search-input">
-          <button id="search-btn"></button>
-          <div id="search-results"></div>
-        </div>
-        <div class="settings-grid">
-          <div class="settings-card">
-            <h3><i class="fas fa-user-cog"></i> Профиль</h3>
-            <div class="settings-option">
-              <label>Ссылка на аватар</label>
-              <input type="text" id="avatar-url" class="settings-input" placeholder="https://...">
-              <button id="update-avatar-url" class="update-btn">Сохранить аватар</button>
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getItemCount</span>
+                    <span class="method-params">(itemId: String) → int</span>
+                </div>
+                <p>Получить количество предмета в инвентаре</p>
+                <div class="code-example">
+                    <pre><code>var diamonds = Player.getItemCount("minecraft:diamond");
+Player.sendMessage("Алмазов: " + diamonds);</code></pre>
+                </div>
             </div>
-            <div class="settings-option">
-              <label>Никнейм <span class="char-counter" id="settings-nickname-counter">0/15</span></label>
-              <input type="text" id="settings-nickname" class="settings-input" placeholder="Ваш никнейм" maxlength="15">
-              <button id="update-settings-nickname" class="update-btn">Сохранить</button>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">removeItem</span>
+                    <span class="method-params">(itemId: String, count: int) → boolean</span>
+                </div>
+                <p>Удалить предмет из инвентаря</p>
+                <div class="code-example">
+                    <pre><code>if (Player.removeItem("minecraft:diamond", 1)) {
+    Player.sendMessage("§eАлмаз удалён из инвентаря");
+}</code></pre>
+                </div>
             </div>
-            <div class="settings-option">
-              <label>Email</label>
-              <input type="email" id="settings-email" class="settings-input" placeholder="Ваш email">
-              <button id="update-settings-email" class="update-btn">Сохранить</button>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">setModel</span>
+                    <span class="method-params">(modelPath: String, animationPath: String, texturePath: String)</span>
+                </div>
+                <p>Установить кастомную модель игроку (GeckoLib формат)</p>
+                <div class="code-example">
+                    <pre><code>Player.setModel(
+    "geo/custom_player.geo.json",
+    "animations/custom_player.json",
+    "textures/custom/player.png"
+);</code></pre>
+                </div>
             </div>
-            <div class="settings-option">
-              <label>Описание <span class="char-counter" id="settings-description-counter">0/100</span></label>
-              <textarea id="settings-description" class="settings-textarea" placeholder="Расскажите о себе..." maxlength="100"></textarea>
-              <button id="update-description" class="update-btn">Сохранить</button>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">applySkinAsTexture</span>
+                    <span class="method-params">(nick: String)</span>
+                </div>
+                <p>Применить скин другого игрока как текстуру модели</p>
+                <div class="code-example">
+                    <pre><code>Player.applySkinAsTexture("Notch");</code></pre>
+                </div>
             </div>
-          </div>
-          <div class="settings-card">
-            <h3><i class="fas fa-palette"></i> Тема и фон</h3>
-            <div class="settings-option">
-              <label>Ссылка на фон профиля</label>
-              <input type="text" id="background-url" class="settings-input" placeholder="https://...">
-              <button id="update-background-url" class="update-btn">Установить фон</button>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">resetModel</span>
+                    <span class="method-params">()</span>
+                </div>
+                <p>Сбросить кастомную модель игрока</p>
             </div>
-            <div class="settings-option">
-              <label>Цветовая схема</label>
-              <div class="theme-buttons">
-                <button class="theme-btn active" data-theme="dark"><i class="fas fa-moon"></i> Тёмная</button>
-                <button class="theme-btn" data-theme="purple"><i class="fas fa-gem"></i> Фиолет</button>
-                <button class="theme-btn" data-theme="blue"><i class="fas fa-water"></i> Синяя</button>
-                <button class="theme-btn" data-theme="green"><i class="fas fa-leaf"></i> Зелёная</button>
-              </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">input</span>
+                    <span class="method-params">(prompt: String, callback: Function)</span>
+                </div>
+                <p>Получить ввод от игрока через чат</p>
+                <div class="code-example">
+                    <pre><code>Player.input("Введите имя:", function(result) {
+    Player.sendMessage("Вы ввели: " + result);
+});</code></pre>
+                </div>
             </div>
-            <div class="settings-option">
-              <button id="reset-background" class="update-btn" style="background:var(--code-bg);color:var(--red);border:1px solid rgba(244,86,106,0.3);box-shadow:none;">Сбросить фон</button>
+        </section>
+
+        <!-- World API -->
+        <section id="world-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                World
+            </h2>
+            <p class="api-desc">Управление блоками и миром</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">setBlock</span>
+                    <span class="method-params">(x: int, y: int, z: int, blockId: String)</span>
+                </div>
+                <p>Установить блок в мире</p>
+                <div class="code-example">
+                    <pre><code>World.setBlock(0, 64, 0, "minecraft:diamond_block");</code></pre>
+                </div>
             </div>
-            <div class="settings-option">
-              <label>Язык</label>
-              <select id="language-select" class="settings-select">
-                <option value="ru">Русский</option>
-                <option value="en">English</option>
-              </select>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getBlock</span>
+                    <span class="method-params">(x: int, y: int, z: int) → String</span>
+                </div>
+                <p>Получить ID блока по координатам</p>
+                <div class="code-example">
+                    <pre><code>var block = World.getBlock(0, 64, 0);
+// Возвращает "minecraft:diamond_block"</code></pre>
+                </div>
             </div>
-          </div>
-          <div class="settings-card danger-zone">
-            <h3><i class="fas fa-exclamation-triangle"></i> Опасная зона</h3>
-            <div class="settings-option">
-              <button id="delete-account" class="danger-btn"><i class="fas fa-trash"></i> Удалить аккаунт</button>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getBlock</span>
+                    <span class="method-params">(x: int, y: int, z: int, blockId: String) → boolean</span>
+                </div>
+                <p>Проверить, является ли блок указанным</p>
+                <div class="code-example">
+                    <pre><code>if (World.getBlock(0, 64, 0, "minecraft:lever")) {
+    Player.sendMessage("Это рычаг!");
+}</code></pre>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div id="communities" class="tab-content">
-        <h2 class="content-title"><i class="fas fa-users"></i> Сообщества</h2>
-        <div class="communities-actions">
-          <button id="create-community-btn" class="auth-btn"><i class="fas fa-plus"></i> Создать</button>
-          <button id="my-communities-btn" class="auth-btn secondary"><i class="fas fa-user"></i> Мои</button>
-          <button id="all-communities-btn" class="auth-btn secondary"><i class="fas fa-globe"></i> Все</button>
-        </div>
-        <div class="search-box" style="margin-bottom:16px;">
-          <input type="text" id="community-search-input" class="search-input" placeholder="Поиск сообществ...">
-          <button id="community-search-btn" class="search-btn"><i class="fas fa-search"></i></button>
-        </div>
-        <div id="communities-grid" class="users-grid">
-          <p style="color:var(--text-dim);text-align:center;grid-column:1/-1;">Загрузка сообществ...</p>
-        </div>
-      </div>
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">spawnExplosion</span>
+                    <span class="method-params">(x: double, y: double, z: double, power: float)</span>
+                </div>
+                <p>Создать взрыв в указанной позиции</p>
+                <div class="code-example">
+                    <pre><code>World.spawnExplosion(100, 64, 100, 4.0);</code></pre>
+                </div>
+            </div>
+        </section>
 
-    </div>
-  </div>
+        <!-- Entity API -->
+        <section id="entity-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Entity
+            </h2>
+            <p class="api-desc">Создание и управление NPC с кастомными моделями</p>
 
-  <!-- Все оригинальные модалки сохранены без изменений -->
-  <div id="profile-modal" class="modal">
-    <div id="modal-background" class="modal-background"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <div id="modal-profile"></div>
-    </div>
-  </div>
-  <div id="badge-modal" class="modal">
-    <div class="modal-background" onclick="closeBadgeModal()"></div>
-    <div class="modal-content" style="max-width:420px;">
-      <button class="modal-close" onclick="closeBadgeModal()"><i class="fas fa-times"></i></button>
-      <h3 style="color:var(--text);font-size:1.1rem;font-weight:800;margin-bottom:6px;"><i class="fas fa-medal" style="color:var(--accent);margin-right:8px;"></i>Бейджи игрока</h3>
-      <p id="badge-modal-username" style="color:var(--text-muted);font-size:0.85rem;margin-bottom:18px;"></p>
-      <div id="badges-admin-list" class="badges-admin-list"></div>
-      <div class="badge-modal-form" id="badge-add-form">
-        <p style="color:var(--text-dim);font-size:0.85rem;font-weight:700;margin-bottom:10px;margin-top:14px;"><i class="fas fa-plus" style="color:var(--accent);margin-right:6px;"></i>Добавить бейдж</p>
-        <input type="text" id="badge-img-url" placeholder="Ссылка на картинку бейджа">
-        <input type="text" id="badge-name-input" placeholder="Название бейджа">
-        <button onclick="adminAddBadge()" class="update-btn" style="width:100%;"><i class="fas fa-plus"></i> Добавить</button>
-      </div>
-    </div>
-  </div>
-  <div id="custom-toast" class="toast">
-    <div class="toast-content"><i class="toast-icon"></i><span class="toast-message"></span></div>
-    <div class="toast-progress"></div>
-  </div>
-  <div id="custom-confirm" class="confirm-modal">
-    <div class="confirm-overlay"></div>
-    <div class="confirm-content">
-      <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
-      <h3 class="confirm-title">Подтверждение</h3>
-      <p class="confirm-message"></p>
-      <div class="confirm-buttons">
-        <button class="confirm-btn confirm-cancel">Отмена</button>
-        <button class="confirm-btn confirm-ok">Подтвердить</button>
-      </div>
-    </div>
-  </div>
-  <div id="community-modal" class="modal">
-    <div class="modal-background" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(16px);"></div>
-    <div class="modal-content" style="max-width:600px;">
-      <button class="modal-close" onclick="closeCommunityModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-users"></i> Создание сообщества</h2>
-      <form id="create-community-form">
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Название</label><input type="text" id="community-name" class="settings-input" required maxlength="50" style="width:100%;"></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Описание</label><textarea id="community-description" class="settings-textarea" maxlength="200" style="width:100%;"></textarea></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Аватар (ссылка)</label><input type="text" id="community-avatar" class="settings-input" style="width:100%;"></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Обложка (ссылка)</label><input type="text" id="community-cover" class="settings-input" style="width:100%;"></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Категория</label><select id="community-category" class="settings-select" style="width:100%;"><option value="gaming">Игры</option><option value="tech">Технологии</option><option value="art">Искусство</option><option value="music">Музыка</option><option value="science">Наука</option><option value="other">Другое</option></select></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Тип</label><select id="community-type" class="settings-select" style="width:100%;"><option value="public">Публичное</option><option value="restricted">Ограниченное</option><option value="private">Закрытое</option></select></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Теги (через запятую)</label><input type="text" id="community-tags" class="settings-input" style="width:100%;"></div>
-        <div id="community-error" class="auth-error" style="margin-bottom:15px;"></div>
-        <button type="submit" class="auth-btn" style="width:100%;"><i class="fas fa-plus"></i> Создать</button>
-      </form>
-    </div>
-  </div>
-  <div id="view-community-modal" class="modal">
-    <div class="modal-background" id="view-community-bg"></div>
-    <div class="modal-content" style="max-width:900px;max-height:90vh;overflow-y:auto;">
-      <button class="modal-close" onclick="closeViewCommunityModal()"><i class="fas fa-times"></i></button>
-      <div id="view-community-content"></div>
-    </div>
-  </div>
-  <div id="post-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content" style="max-width:600px;">
-      <button class="modal-close" onclick="closePostModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-pen"></i> Создание поста</h2>
-      <form id="create-post-form">
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Заголовок</label><input type="text" id="post-title" class="settings-input" required maxlength="100" style="width:100%;"></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Содержание</label><textarea id="post-content" class="settings-textarea" required maxlength="5000" style="width:100%;min-height:150px;"></textarea></div>
-        <div class="form-group"><label style="color:var(--text-dim);font-size:0.8rem;font-weight:700;display:block;margin-bottom:6px;">Изображение (необязательно)</label><input type="text" id="post-image" class="settings-input" style="width:100%;"></div>
-        <div id="post-error" class="auth-error" style="margin-bottom:15px;"></div>
-        <button type="submit" class="auth-btn" style="width:100%;"><i class="fas fa-paper-plane"></i> Опубликовать</button>
-      </form>
-    </div>
-  </div>
-  <div id="view-post-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content" style="max-width:700px;max-height:90vh;overflow-y:auto;">
-      <button class="modal-close" onclick="closeViewPostModal()"><i class="fas fa-times"></i></button>
-      <div id="view-post-content"></div>
-    </div>
-  </div>
-  <div id="members-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content" style="max-width:500px;max-height:80vh;overflow-y:auto;">
-      <button class="modal-close" onclick="closeMembersModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-users"></i> Участники</h2>
-      <div id="members-list"></div>
-    </div>
-  </div>
-  <div id="invite-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content" style="max-width:500px;">
-      <button class="modal-close" onclick="closeInviteModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-link"></i> Ссылка-приглашение</h2>
-      <div style="text-align:center;margin-bottom:20px;"><div id="invite-community-name" style="color:var(--text);font-size:1.1rem;margin-bottom:10px;"></div><p style="color:var(--text-dim);">Поделитесь ссылкой для приглашения в сообщество.</p></div>
-      <input type="text" id="invite-link" class="settings-input" style="width:100%;text-align:center;margin-bottom:10px;" readonly>
-      <button id="copy-invite-link" class="auth-btn" style="width:100%;margin-bottom:10px;"><i class="fas fa-copy"></i> Копировать</button>
-      <p id="invite-link-copied" style="color:var(--green);text-align:center;display:none;">Скопировано!</p>
-    </div>
-  </div>
-  <div id="verification-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content" style="max-width:400px;">
-      <button class="modal-close" onclick="closeVerificationModal()"><i class="fas fa-times"></i></button>
-      <h2 style="text-align:center;margin-bottom:20px;color:var(--text);"><i class="fas fa-check-circle"></i> Верификация</h2>
-      <p style="color:var(--text-dim);text-align:center;margin-bottom:20px;">Верифицированные сообщества имеют значок и приоритет в поиске.</p>
-      <div id="verification-status" style="margin-bottom:20px;"></div>
-      <button id="request-verification-btn" class="auth-btn" style="width:100%;"><i class="fas fa-paper-plane"></i> Подать заявку</button>
-    </div>
-  </div>
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">create</span>
+                    <span class="method-params">(pos: Vec3d, name: String, modelPath: String, animationPath: String, texturePath: String, fraction?: String) → EntityHandle</span>
+                </div>
+                <p>Создать NPC с кастомной моделью</p>
+                <div class="code-example">
+                    <pre><code>var npc = Entity.create(
+    pos(100, 64, 200),
+    "Торговец",
+    "geo/npc.geo.json",
+    "animations/npc.json",
+    "textures/npc.png",
+    "Neutral"
+);</code></pre>
+                </div>
+            </div>
 
-  <script src="translations.js"></script>
-  <script src="script.js"></script>
-  <script>
-    // ── TABS SCROLL ARROWS ──────────────────────────────────────────────────
-    (function() {
-      var tabsEl  = document.getElementById('tabs-scroll');
-      var btnPrev = document.getElementById('tabs-prev');
-      var btnNext = document.getElementById('tabs-next');
-      var STEP    = 200;
+            <h3 class="subsection-title">EntityHandle методы</h3>
 
-      function updateArrows() {
-        var atStart = tabsEl.scrollLeft <= 2;
-        var atEnd   = tabsEl.scrollLeft + tabsEl.clientWidth >= tabsEl.scrollWidth - 2;
-        btnPrev.classList.toggle('disabled', atStart);
-        btnNext.classList.toggle('disabled', atEnd);
-      }
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">move</span>
+                    <span class="method-params">(pos: Vec3d, speed?: double)</span>
+                </div>
+                <p>Заставить NPC идти к точке</p>
+                <div class="code-example">
+                    <pre><code>npc.move(pos(110, 64, 200), 1.5);</code></pre>
+                </div>
+            </div>
 
-      window.scrollTabs = function(dir) {
-        tabsEl.scrollLeft += dir * STEP;
-        setTimeout(updateArrows, 320);
-      };
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">look</span>
+                    <span class="method-params">(pos: Vec3d)</span>
+                </div>
+                <p>Разово посмотреть на точку</p>
+            </div>
 
-      tabsEl.addEventListener('scroll', updateArrows);
-      window.addEventListener('resize', updateArrows);
-      setTimeout(updateArrows, 100);
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">lookAlways</span>
+                    <span class="method-params">(pos: Vec3d | PlayerAPI)</span>
+                </div>
+                <p>Постоянно смотреть на точку или игрока</p>
+                <div class="code-example">
+                    <pre><code>npc.lookAlways(Player);
+// или
+npc.lookAlways(pos(100, 65, 200));</code></pre>
+                </div>
+            </div>
 
-      // Прокручиваем к активной вкладке при клике
-      tabsEl.addEventListener('click', function(e) {
-        var btn = e.target.closest('.tab');
-        if (!btn) return;
-        setTimeout(function() {
-          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-          updateArrows();
-        }, 50);
-      });
-    })();
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">setFraction</span>
+                    <span class="method-params">(fraction: String)</span>
+                </div>
+                <p>Установить поведение NPC</p>
+                <div class="info-box small">
+                    <strong>Фракции:</strong>
+                    <ul>
+                        <li><code>"Neutral"</code> - мирный, но ответит ударом</li>
+                        <li><code>"Aggressive"</code> - нападает при виде игрока</li>
+                        <li><code>"Peaceful"</code> - никогда не атакует</li>
+                    </ul>
+                </div>
+            </div>
 
-    // ── TOPBAR USER SEARCH ──────────────────────────────────────────────────
-    (function() {
-      var input   = document.getElementById('topbar-search-input');
-      var btn     = document.getElementById('topbar-search-btn');
-      var results = document.getElementById('topbar-search-results');
-      var list    = document.getElementById('topbar-search-list');
-      var wrap    = document.getElementById('topbar-search-wrap');
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">playAnimation</span>
+                    <span class="method-params">(name: String, mode: String)</span>
+                </div>
+                <p>Воспроизвести анимацию</p>
+                <div class="code-example">
+                    <pre><code>npc.playAnimation("wave", "loop");
+// mode: "loop", "once", "hold"</code></pre>
+                </div>
+            </div>
 
-      function showResults(html) {
-        list.innerHTML = html;
-        results.classList.add('visible');
-      }
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">say</span>
+                    <span class="method-params">(text: String)</span>
+                </div>
+                <p>Показать текст над NPC</p>
+                <div class="code-example">
+                    <pre><code>npc.say("Привет, путник!");</code></pre>
+                </div>
+            </div>
 
-      function doSearch() {
-        var q = input.value.trim();
-        if (!q) return;
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">kill</span>
+                    <span class="method-params">()</span>
+                </div>
+                <p>Убить NPC</p>
+            </div>
 
-        showResults('<div class="topbar-search-loading"><i class="fas fa-spinner"></i> Поиск...</div>');
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">remove</span>
+                    <span class="method-params">()</span>
+                </div>
+                <p>Удалить NPC из мира</p>
+            </div>
+        </section>
 
-        // Используем ту же firebase-логику что и в оригинальном script.js
-        // Ищем по полю nickname через Firestore
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-          var db = firebase.firestore();
-          db.collection('users')
-            .where('nickname', '>=', q)
-            .where('nickname', '<=', q + '\uf8ff')
-            .limit(10)
-            .get()
-            .then(function(snap) {
-              if (snap.empty) {
-                showResults('<div class="topbar-search-empty"><i class="fas fa-user-slash" style="font-size:1.5rem;margin-bottom:8px;display:block;color:var(--text-muted)"></i>Пользователи не найдены</div>');
-                return;
-              }
-              var html = '';
-              snap.forEach(function(doc) {
-                var d = doc.data();
-                var avatar = d.avatarUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s';
-                var nick   = d.nickname || 'Аноним';
-                var desc   = d.description || '';
-                var uid    = doc.id;
-                html += '<div class="user-card" onclick="openUserProfile(\'' + uid + '\')">'
-                      + '<img class="user-avatar" src="' + avatar + '" onerror="this.src=\'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFA_-SJuY6WvY2hW4vYTPIwGTgsIvqFPnSA&s\'">'
-                      + '<div class="user-info">'
-                      + '<div class="user-name">' + nick + '</div>'
-                      + (desc ? '<div class="user-description">' + desc + '</div>' : '')
-                      + '</div></div>';
-              });
-              showResults(html);
-            })
-            .catch(function(err) {
-              showResults('<div class="topbar-search-empty">Ошибка поиска</div>');
-            });
-        } else {
-          // Если firebase ещё не инициализирован — покажем заглушку
-          showResults('<div class="topbar-search-empty">Firebase не подключён</div>');
-        }
-      }
+        <!-- Item API -->
+        <section id="item-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Item
+            </h2>
+            <p class="api-desc">Создание кастомных предметов</p>
 
-      btn.addEventListener('click', doSearch);
-      input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') doSearch();
-      });
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">create</span>
+                    <span class="method-params">(name: String, modelPath: String, displayPath: String, animationPath: String, texturePath?: String) → ItemHandle</span>
+                </div>
+                <p>Создать кастомный предмет</p>
+                <div class="code-example">
+                    <pre><code>var sword = Item.create(
+    "Меч Дракона",
+    "geo/dragon_sword.geo.json",
+    "display/dragon_sword.json",
+    "animations/dragon_sword.json",
+    "textures/items/dragon_sword.png"
+);</code></pre>
+                </div>
+            </div>
 
-      // Закрыть при клике вне
-      document.addEventListener('mousedown', function(e) {
-        if (!wrap.contains(e.target)) {
-          results.classList.remove('visible');
-        }
-      });
+            <h3 class="subsection-title">ItemHandle методы</h3>
 
-      window.closeTopbarSearch = function() {
-        results.classList.remove('visible');
-        input.value = '';
-      };
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">give</span>
+                    <span class="method-params">(playerName: String | PlayerAPI)</span>
+                </div>
+                <p>Выдать предмет игроку</p>
+                <div class="code-example">
+                    <pre><code>sword.give(Player);
+// или
+sword.give("Steve");</code></pre>
+                </div>
+            </div>
 
-      // Функция открытия профиля — вызывает оригинальный script.js openModal
-      window.openUserProfile = function(uid) {
-        results.classList.remove('visible');
-        if (typeof openUserModal === 'function') {
-          openUserModal(uid);
-        } else if (typeof openModal === 'function') {
-          openModal(uid);
-        }
-      };
-    })();
-  </script>
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">spawn</span>
+                    <span class="method-params">(pos: Vec3d)</span>
+                </div>
+                <p>Спавнить предмет в мире</p>
+                <div class="code-example">
+                    <pre><code>sword.spawn(pos(100, 65, 200));</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Camera API -->
+        <section id="camera-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Camera
+            </h2>
+            <p class="api-desc">Создание катсцен и управление камерой</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">play</span>
+                    <span class="method-params">(fileName: String, durationSeconds: double, player: PlayerAPI)</span>
+                </div>
+                <p>Воспроизвести катсцену из файла</p>
+                <div class="code-example">
+                    <pre><code>Camera.play("intro_cutscene.cadr", 10.0, Player);</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">stop</span>
+                    <span class="method-params">(player: PlayerAPI)</span>
+                </div>
+                <p>Остановить катсцену</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">isPlaying</span>
+                    <span class="method-params">(player: PlayerAPI) → boolean</span>
+                </div>
+                <p>Проверить, воспроизводится ли катсцена</p>
+            </div>
+
+            <div class="info-box">
+                <strong>Создание катсцены:</strong>
+                <ol>
+                    <li>Возьмите предмет "Камера" в руку</li>
+                    <li>Нажмите ПКМ для добавления точек</li>
+                    <li>Используйте <code>/procherc_camera save yes</code> для сохранения</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Async API -->
+        <section id="async-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Async
+            </h2>
+            <p class="api-desc">Асинхронные операции и задержки</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">await</span>
+                    <span class="method-params">(seconds: double)</span>
+                </div>
+                <p>Приостановить выполнение скрипта</p>
+                <div class="code-example">
+                    <pre><code>Player.sendMessage("Подождите 3 секунды...");
+Async.await(3);
+Player.sendMessage("Готово!");</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">await</span>
+                    <span class="method-params">(condition: Function, callback: Function)</span>
+                </div>
+                <p>Ждать выполнения условия, затем вызвать callback</p>
+                <div class="code-example">
+                    <pre><code>Async.await(function() {
+    return World.getBlock(0, 64, 0, "minecraft:lever");
+}, function() {
+    Player.sendMessage("§aРычаг активирован!");
+});</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event API -->
+        <section id="event-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Event
+            </h2>
+            <p class="api-desc">Обработка событий игрока</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onBlockBreak</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при ломании блока</p>
+                <div class="code-example">
+                    <pre><code>Event.onBlockBreak(Player.getServerPlayer(), function(e) {
+    Player.sendMessage("Вы сломали: " + e.block);
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onBlockPlace</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при установке блока</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onJump</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при прыжке</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onCrouch</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при приседании</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onSprint</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при беге</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onDeath</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при смерти</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onDamage</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при получении урона</p>
+                <div class="code-example">
+                    <pre><code>Event.onDamage(Player.getServerPlayer(), function(e) {
+    Player.sendMessage("Урон: " + e.amount);
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onAttack</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при атаке существа</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onSwim</span>
+                    <span class="method-params">(player: ServerPlayerEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при плавании</p>
+            </div>
+        </section>
+
+        <!-- Sound API -->
+        <section id="sound-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Sound
+            </h2>
+            <p class="api-desc">Воспроизведение звуков</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">playForPlayer</span>
+                    <span class="method-params">(player: PlayerAPI, soundId: String, volume?: float, pitch?: float)</span>
+                </div>
+                <p>Воспроизвести звук для конкретного игрока</p>
+                <div class="code-example">
+                    <pre><code>Sound.playForPlayer(Player, "minecraft:entity.experience_orb.pickup", 1.0, 1.0);</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">playAt</span>
+                    <span class="method-params">(pos: Vec3d, soundId: String, volume?: float, pitch?: float)</span>
+                </div>
+                <p>Воспроизвести звук в позиции</p>
+                <div class="code-example">
+                    <pre><code>Sound.playAt(pos(100, 64, 200), "minecraft:block.anvil.use", 1.0, 1.0);</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">playAll</span>
+                    <span class="method-params">(soundId: String, volume?: float, pitch?: float)</span>
+                </div>
+                <p>Воспроизвести звук для всех игроков</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">stopForPlayer</span>
+                    <span class="method-params">(player: PlayerAPI, soundId: String)</span>
+                </div>
+                <p>Остановить звук для игрока</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">stopAllForPlayer</span>
+                    <span class="method-params">(player: PlayerAPI)</span>
+                </div>
+                <p>Остановить все звуки для игрока</p>
+            </div>
+        </section>
+
+        <!-- Particle API -->
+        <section id="particle-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Particle
+            </h2>
+            <p class="api-desc">Bedrock-стиль частицы (Snowstorm формат)</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">Start</span>
+                    <span class="method-params">(effectId: String, pos: Vec3d)</span>
+                </div>
+                <p>Запустить эффект частиц для всех игроков</p>
+                <div class="code-example">
+                    <pre><code>Particle.Start("snowstorm:rain", pos(100, 64, 200));</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">Start</span>
+                    <span class="method-params">(effectId: String, pos: Vec3d, player: PlayerAPI)</span>
+                </div>
+                <p>Запустить эффект частиц только для указанного игрока</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">Stop</span>
+                    <span class="method-params">(pos: Vec3d)</span>
+                </div>
+                <p>Остановить все частицы в позиции</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">StopAll</span>
+                    <span class="method-params">(effectId?: String)</span>
+                </div>
+                <p>Остановить все частицы указанного типа или все вообще</p>
+                <div class="code-example">
+                    <pre><code>Particle.StopAll("snowstorm:rain");
+Particle.StopAll(); // Все частицы</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Файлы частиц:</strong>
+                <p>Поместите <code>.particle.json</code> файлы в:</p>
+                <code>resourcepacks/&lt;Pack&gt;/assets/&lt;namespace&gt;/particles/&lt;name&gt;.particle.json</code>
+            </div>
+        </section>
+
+        <!-- GUI API -->
+        <section id="gui-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Gui
+            </h2>
+            <p class="api-desc">Создание кастомных интерфейсов</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">create</span>
+                    <span class="method-params">(title: String) → ScriptGui</span>
+                </div>
+                <p>Создать GUI</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">createButton</span>
+                    <span class="method-params">(id: String, text: String, x: int, y: int, width: int, height: int) → GuiElement</span>
+                </div>
+                <p>Создать кнопку</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">createImage</span>
+                    <span class="method-params">(id: String, texture: String, x: int, y: int, width: int, height: int) → GuiElement</span>
+                </div>
+                <p>Создать изображение</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">createLabel</span>
+                    <span class="method-params">(id: String, text: String, x: int, y: int, width: int, height: int) → GuiElement</span>
+                </div>
+                <p>Создать текстовую метку</p>
+           {}
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">createPanel</span>
+                    <span class="method-params">(id: String, x: int, y: int, width: int, height: int) → GuiElement</span>
+                </div>
+                <p>Создать панель</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">addElement</span>
+                    <span class="method-params">(gui: ScriptGui, element: GuiElement)</span>
+                </div>
+                <p>Добавить элемент в GUI</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">open</span>
+                    <span class="method-params">(gui: ScriptGui)</span>
+                </div>
+                <p>Открыть GUI для игрока</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">close</span>
+                    <span class="method-params">()</span>
+                </div>
+                <p>Закрыть GUI</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">updateGui</span>
+                    <span class="method-params">(gui: ScriptGui)</span>
+                </div>
+                <p>Обновить GUI после изменений</p>
+            </div>
+
+            <div class="code-example">
+                <pre><code>var gui = Gui.create("Меню");
+var btn = Gui.createButton("btn1", "Нажми меня", 10, 10, 100, 20);
+Gui.addElement(gui, btn);
+Gui.open(gui);</code></pre>
+            </div>
+        </section>
+
+        <!-- Hitbox API -->
+        <section id="hitbox-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Hitbox
+            </h2>
+            <p class="api-desc">Интерактивные зоны и триггеры</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">create</span>
+                    <span class="method-params">(x: double, y: double, z: double, width: float, height: float) → HitBoxEntity</span>
+                </div>
+                <p>Создать интерактивную зону</p>
+                <div class="code-example">
+                    <pre><code>var zone = Hitbox.create(100, 64, 200, 3.0, 2.0);</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">create</span>
+                    <span class="method-params">(name: String, x: double, y: double, z: double, width: float, height: float) → HitBoxEntity</span>
+                </div>
+                <p>Создать именованную зону</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onInteract</span>
+                    <span class="method-params">(entity: InteractionEntity, callback: Function)</span>
+                </div>
+                <p>Вызывается при взаимодействии с зоной</p>
+                <div class="code-example">
+                    <pre><code>Hitbox.onInteract(zone, function(e) {
+    e.player.sendMessage("Вы нажали на зону!");
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onEnter</span>
+                    <span class="method-params">(hitbox: Entity, callback: Function)</span>
+                </div>
+                <p>Вызывается при входе игрока в зону</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">onExit</span>
+                    <span class="method-params">(hitbox: Entity, callback: Function)</span>
+                </div>
+                <p>Вызывается при выходе игрока из зоны</p>
+                <div class="code-example">
+                    <pre><code>Hitbox.onEnter(zone, function(e) {
+    e.player.sendMessage("Добро пожаловать!");
+});
+
+Hitbox.onExit(zone, function(e) {
+    e.player.sendMessage("До свидания!");
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">remove</span>
+                    <span class="method-params">(entity: InteractionEntity)</span>
+                </div>
+                <p>Удалить зону</p>
+            </div>
+        </section>
+
+        <!-- Server API -->
+        <section id="server-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Server
+            </h2>
+            <p class="api-desc">Управление сервером</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getPlayerCount</span>
+                    <span class="method-params">() → int</span>
+                </div>
+                <p>Получить количество онлайн игроков</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getMaxPlayers</span>
+                    <span class="method-params">() → int</span>
+                </div>
+                <p>Получить максимальное количество игроков</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getOnlinePlayer</span>
+                <div class="method-params">() → List&lt;String&gt;</span>
+                </div>
+                <p>Получить список имён онлайн игроков</p>
+                <div class="code-example">
+                    <pre><code>var players = Server.getOnlinePlayer();
+for (var i = 0; i < players.size(); i++) {
+    Player.sendMessage(players.get(i));
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getPlayerByName</span>
+                    <span class="method-params">(name: String) → PlayerAPI</span>
+                </div>
+                <p>Получить игрока по имени</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getRandomPlayer</span>
+                    <span class="method-params">() → PlayerAPI</span>
+                </div>
+                <p>Получить случайного игрока</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">executeCommand</span>
+                    <span class="method-params">(command: String)</span>
+                </div>
+                <p>Выполнить команду от имени сервера</p>
+                <div class="code-example">
+                    <pre><code>Server.executeCommand("gamemode creative @a");</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">broadcast</span>
+                    <span class="method-params">(message: String)</span>
+                </div>
+                <p>Отправить сообщение всем игрокам</p>
+                <div class="code-example">
+                    <pre><code>Server.broadcast("§e[Сервер] §fПривет всем!");</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">getTicks</span>
+                    <span class="method-params">() → long</span>
+                </div>
+                <p>Получить количество тиков сервера</p>
+            </div>
+        </section>
+
+        <!-- Time API -->
+        <section id="time-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                Time
+            </h2>
+            <p class="api-desc">Управление временем в мире</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">setTime</span>
+                    <span class="method-params">(time: long)</span>
+                </div>
+                <p>Установить время дня</p>
+                <div class="code-example">
+                    <pre><code>Time.setTime(6000); // Полдень
+Time.setTime(13000); // Ночь</code></pre>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">freezeTime</span>
+                    <span class="method-params">()</span>
+                </div>
+                <p>Заморозить время</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">freezeResume</span>
+                    <span class="method-params">()</span>
+                </div>
+                <p>Разморозить время</p>
+            </div>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">wait</span>
+                    <span class="method-params">(seconds: double)</span>
+                </div>
+                <p>Приостановить выполнение (аналог Async.await)</p>
+            </div>
+        </section>
+
+        <!-- KeyBind API -->
+        <section id="keybind-api" class="section api-section">
+            <h2 class="section-title">
+                <span class="api-badge">API</span>
+                KeyBind
+            </h2>
+            <p class="api-desc">Регистрация кастомных клавиш</p>
+
+            <div class="method-card">
+                <div class="method-header">
+                    <span class="method-name">keybind</span>
+                    <span class="method-params">(keyName: String, callback: Function)</span>
+                </div>
+                <p>Зарегистрировать обработчик нажатия клавиши</p>
+                <div class="code-example">
+                    <pre><code>KeyBind.keybind("G", function(e) {
+    Player.sendMessage("Вы нажали G!");
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Имена клавиш:</strong>
+                <p>Используйте стандартные имена: <code>A</code>, <code>B</code>, <code>SPACE</code>, <code>SHIFT</code>, <code>F1</code>-<code>F12</code>, <code>1</code>-<code>9</code>, <code>0</code> и т.д.</p>
+            </div>
+        </section>
+
+        <!-- Java Interop Section -->
+        <section id="java-interop" class="section">
+            <h2 class="section-title">Java интеграция</h2>
+            <p class="section-desc">
+                ProchercEngine предоставляет прямой доступ к Java классам Minecraft через функцию <code>Java()</code>.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Примеры использования</span>
+                </div>
+                <pre><code>// Получить класс ItemStack
+var ItemStack = Java("net.minecraft.item.ItemStack");
+
+// Использовать алиасы
+var Items = Java("Items");
+var stack = new ItemStack(Items.DIAMOND_SWORD, 1);
+
+// Доступ к NBT
+var NbtCompound = Java("NbtCompound");
+var nbt = new NbtCompound();
+nbt.putString("key", "value");
+
+// Математические функции
+var Math = Java("Math");
+var random = Math.random();</code></pre>
+            </div>
+
+            <h3 class="subsection-title">Доступные алиасы</h3>
+            <div class="table-wrapper">
+                <table class="alias-table">
+                    <thead>
+                        <tr>
+                            <th>Алиас</th>
+                            <th>Полный путь</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>ItemStack</code></td><td>net.minecraft.item.ItemStack</td></tr>
+                        <tr><td><code>Items</code></td><td>net.minecraft.item.Items</td></tr>
+                        <tr><td><code>BlockPos</code></td><td>net.minecraft.util.math.BlockPos</td></tr>
+                        <tr><td><code>Blocks</code></td><td>net.minecraft.block.Blocks</td></tr>
+                        <tr><td><code>Vec3d</code></td><td>net.minecraft.util.math.Vec3d</td></tr>
+                        <tr><td><code>Text</code></td><td>net.minecraft.text.Text</td></tr>
+                        <tr><td><code>NbtCompound</code></td><td>net.minecraft.nbt.NbtCompound</td></tr>
+                        <tr><td><code>NbtList</code></td><td>net.minecraft.nbt.NbtList</td></tr>
+                        <tr><td><code>Identifier</code></td><td>net.minecraft.util.Identifier</td></tr>
+                        <tr><td><code>GameMode</code></td><td>net.minecraft.world.GameMode</td></tr>
+                        <tr><td><code>SoundEvents</code></td><td>net.minecraft.sound.SoundEvents</td></tr>
+                        <tr><td><code>ArrayList</code></td><td>java.util.ArrayList</td></tr>
+                        <tr><td><code>HashMap</code></td><td>java.util.HashMap</td></tr>
+                        <tr><td><code>UUID</code></td><td>java.util.UUID</td></tr>
+                        <tr><td><code>Math</code></td><td>java.lang.Math</td></tr>
+                        <tr><td><code>Random</code></td><td>java.util.Random</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="subsection-title">Вспомогательная функция pos()</h3>
+            <p>Для создания Vec3d используйте встроенную функцию:</p>
+            <div class="code-example">
+                <pre><code>var position = pos(100, 64, 200);
+// Эквивалентно:
+var position = new (Java("Vec3d"))(100, 64, 200);</code></pre>
+            </div>
+        </section>
+
+        <!-- Examples Section -->
+        <section id="examples" class="section">
+            <h2 class="section-title">Примеры скриптов</h2>
+
+            <div class="example-card">
+                <h3>Простой диалог с NPC</h3>
+                <div class="code-block">
+                    <pre><code>// Создаём NPC
+var npc = Entity.create(
+    pos(100, 64, 200),
+    "Старик",
+    "geo/villager.geo.json",
+    "animations/villager.json",
+    "textures/villager.png"
+);
+
+// NPC смотрит на игрока
+npc.lookAlways(Player);
+
+// Создаём зону взаимодействия
+var zone = Hitbox.create(100, 64, 200, 2, 3);
+Hitbox.onInteract(zone, function(e) {
+    npc.say("Привет, путник!");
+    Async.await(2);
+    npc.say("Добро пожаловать в нашу деревню!");
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <h3>Проверка предметов</h3>
+                <div class="code-block">
+                    <pre><code>// Проверяем есть ли у игрока алмазы
+if (Player.hasItem("minecraft:diamond", 5)) {
+    // Забираем алмазы
+    Player.removeItem("minecraft:diamond", 5);
+    
+    // Даём награду
+    var sword = Item.create(
+        "Алмазный меч",
+        "geo/diamond_sword.geo.json",
+        "display/sword.json",
+        "animations/sword.json"
+    );
+    sword.give(Player);
+    
+    Player.sendMessage("§aВы обменяли 5 алмазов на меч!");
+} else {
+    Player.sendMessage("§cНужно 5 алмазов для обмена!");
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <h3>Катсцена</h3>
+                <div class="code-block">
+                    <pre><code>// Запускаем катсцену
+Camera.play("intro.cadr", 15.0, Player);
+
+// Ждём завершения
+Async.await(15);
+
+Player.sendMessage("§eКатсцена завершена!");</code></pre>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <h3>События игрока</h3>
+                <div class="code-block">
+                    <pre><code>// Реакция на прыжок
+Event.onJump(Player.getServerPlayer(), function(e) {
+    Particle.Start("snowstorm:jump", pos(e.x, e.y, e.z));
+    Sound.playAt(pos(e.x, e.y, e.z), "minecraft:entity.phantom.flap", 0.5, 1.5);
+});
+
+// Реакция на смерть
+Event.onDeath(Player.getServerPlayer(), function(e) {
+    Server.broadcast("§c" + Player.getName() + " погиб!");
+});
+
+// Реакция на урон
+Event.onDamage(Player.getServerPlayer(), function(e) {
+    Player.sendMessage("§cУрон: " + e.amount);
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <h3>Кастомный GUI</h3>
+                <div class="code-block">
+                    <pre><code>// Создаём GUI
+var gui = Gui.create("§6Магазин");
+
+// Добавляем элементы
+var title = Gui.createLabel("title", "§eВыберите товар", 10, 10, 200, 20);
+Gui.addElement(gui, title);
+
+var btn1 = Gui.createButton("buy_sword", "Купить меч", 10, 40, 100, 25);
+var btn2 = Gui.createButton("buy_armor", "Купить броню", 10, 70, 100, 25);
+var closeBtn = Gui.createButton("close", "§cЗакрыть", 10, 120, 100, 25);
+
+Gui.addElement(gui, btn1);
+Gui.addElement(gui, btn2);
+Gui.addElement(gui, closeBtn);
+
+// Открываем GUI
+Gui.open(gui);</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>ProchercEngine © 2026 | Документация для версии 1.0</p>
+            <p>Создано с ❤️ для Minecraft моддинга</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
